@@ -12,9 +12,9 @@ const exo = Exo({
 })
 
 export const metadata: Metadata = {
-  title: "Mon Application",
+  title: "Turbo Finance",
   description:
-    "Une application Next.js avec une sidebar et navbar professionnelles",
+    "Gestion financière de turbo",
 }
 
 export default function RootLayout({

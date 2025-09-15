@@ -83,9 +83,9 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                                 alt="Logo"
                                 width={80}
                                 height={80}
-                                className="rounded-lg"
+                                className="rounded-lg h-[60px] w-[60px] md:h-[80px] md:w-[80px]"
                             />
-                            <p className="text-[14px] md:text-[20px] font-bold italic">Turbo Finance</p>
+                            <p className="text-[18px] md:text-[20px] font-bold italic">Turbo Finance</p>
                         </div>
                         <Button
                             variant="ghost"
