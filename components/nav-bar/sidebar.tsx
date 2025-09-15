@@ -85,7 +85,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                                 height={80}
                                 className="rounded-lg"
                             />
-                            <p className="text-[20px] font-bold italic">Turbo Finance</p>
+                            <p className="text-[14px] md:text-[20px] font-bold italic">Turbo Finance</p>
                         </div>
                         <Button
                             variant="ghost"
