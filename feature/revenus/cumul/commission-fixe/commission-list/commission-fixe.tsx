@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Table,
@@ -17,48 +19,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import FilterRestaurant from "@/feature/revenus/filtres/restaurant/filter-restaurant"
 import FilterPeriode from "@/feature/revenus/filtres/periode/filter-periode"
+import { commissionFixe } from "./data"
+import { CommissionFixeDetailModal } from "./commission-fixe-detail-modal"
 export default function CommissionFixe() {
-
-    const commissionFixe = [
-        {
-            id: 1,
-            date: "28 septembre 2025",
-            restaurant: "Restaurant 1",
-            localisation: "cocody",
-            commission: "1000",
-
-        },
-        {
-            id: 2,
-            date: "20 août 2025",
-            restaurant: "Restaurant 1",
-            localisation: "angre",
-            commission: "1000",
-        },
-        {
-            id: 3,
-            date: "15 août 2025",
-            restaurant: "Restaurant 1",
-            localisation: "yopougon",
-            commission: "1000",
-        },
-        {
-            id: 4,
-            date: "10 août 2025",
-            restaurant: "Restaurant 1",
-            localisation: "port bouet",
-            commission: "1000",
-        },
-        {
-            id: 5,
-            date: "10 août 2025",
-            restaurant: "Restaurant 1",
-            localisation: "marcory",
-            commission: "1000",
-        },
-    ]
-
-
 
     // Formatage de la date pour mobile
     const formatDateForMobile = (date: string) => {
@@ -111,14 +74,13 @@ export default function CommissionFixe() {
                                         <TableCell className="text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
+                                                    <Button variant="destructive" size="sm" className="bg-red-400 hover:bg-red-600 cursor-pointer">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem className="flex items-center gap-2">
-                                                        <Eye className="h-4 w-4" />
-                                                        Voir détails
+                                                    <DropdownMenuItem onSelect={(e) => { e.preventDefault() }}>
+                                                       <CommissionFixeDetailModal commissionFixe={commissionFixe} />
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -152,8 +114,7 @@ export default function CommissionFixe() {
                                     </div>
                                     <div className="text-center">
                                         <button className="flex items-center px-3 py-1.5 text-xs border border-input rounded-md bg-background hover:bg-accent hover:text-accent-foreground">
-                                            <Eye className="h-4 w-4 mr-1" />
-                                            <span className="hidden md:inline">Détails</span>
+                                            <CommissionFixeDetailModal commissionFixe={commissionFixe} />
                                         </button>
                                     </div>
                                 </div>

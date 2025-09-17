@@ -1,3 +1,5 @@
+
+"use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Table,
@@ -17,56 +19,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import FilterRestaurant from "@/feature/revenus/filtres/restaurant/filter-restaurant"
 import FilterPeriode from "@/feature/revenus/filtres/periode/filter-periode"
-export default function CommissionPourcentageList() {
-    const taux = 5
-    const montant_commande = 10000
-    const montant_commission = taux * montant_commande * 0.01
+import { commissionvariable } from "./data"
+import { CommissionVariableDetailModal } from "./commission-pourcentage-detail-modal"
 
-    const commissionvariable = [
-        {
-            id: 1,
-            date: "28 septembre 2025",
-            restaurant: "Restaurant 1",
-            localisation: "cocody",
-            montant_commande: montant_commande,
-            commission: montant_commission,
-
-        },
-        {
-            id: 2,
-            date: "20 août 2025",
-            restaurant: "Restaurant 1",
-            localisation: "angre",
-            montant_commande: montant_commande,
-            commission: montant_commission,
-        },
-        {
-            id: 3,
-            date: "15 août 2025",
-            restaurant: "Restaurant 1",
-            localisation: "yopougon",
-            montant_commande: montant_commande,
-            commission: montant_commission,
-        },
-        {
-            id: 4,
-            date: "10 août 2025",
-            restaurant: "Restaurant 1",
-            localisation: "port bouet",
-            montant_commande: montant_commande,
-            commission: montant_commission,
-        },
-        {
-            id: 5,
-            date: "10 août 2025",
-            restaurant: "Restaurant 1",
-            localisation: "marcory",
-            montant_commande: montant_commande,
-            commission: montant_commission,
-        },
-    ]
-
-
+export default function CommissionPourcentageList() { 
 
     // Formatage de la date pour mobile
     const formatDateForMobile = (date: string) => {
@@ -120,20 +76,19 @@ export default function CommissionPourcentageList() {
                                         
                                         <TableCell className="text-center">
                                             <span className={` text-xs capitalize `}>
-                                                {commissionvariable.commission} XOF
+                                                10%({commissionvariable.commission +" XOF"})
                                             </span>
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
+                                                    <Button variant="destructive" size="sm" className="bg-red-400 hover:bg-red-600 cursor-pointer">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem className="flex items-center gap-2">
-                                                        <Eye className="h-4 w-4" />
-                                                        Voir détails
+                                                    <DropdownMenuItem onSelect={(e) => {(e.preventDefault())}}>
+                                                      <CommissionVariableDetailModal commissionVariable={commissionvariable} />
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>

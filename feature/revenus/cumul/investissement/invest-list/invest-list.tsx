@@ -1,3 +1,4 @@
+"use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Table,
@@ -17,50 +18,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import FilterRestaurant from "@/feature/revenus/filtres/restaurant/filter-restaurant"
 import FilterPeriode from "@/feature/revenus/filtres/periode/filter-periode"
+import { AddInvestModal } from "../creer-invest/add-invest-modal"
+import { investissement } from "./data"
+import { InvestDetailModal } from "./invest-detail-modal"
 
 export default function InvestissementList() {
-
-
-    const investissement = [
-        {
-            id: 1,
-            date_pret: "28 septembre 2025",
-            investisseur: "Investisseur 1",
-            montant_pret: 1000,
-            echeance: "28 septembre 2025",
-            
-
-        },
-        {
-            id: 2,
-            date_pret: "20 août 2025",
-            investisseur: "Investisseur 1",
-            montant_pret: 1000,
-            echeance: "28 septembre 2025",
-        },
-        {
-            id: 3,
-            date_pret: "15 août 2025",
-            investisseur: "Investisseur 1",
-            montant_pret: 1000,
-            echeance: "28 septembre 2025",
-        },
-        {
-            id: 4,
-            date_pret: "10 août 2025",
-            investisseur: "Investisseur 1",
-            montant_pret: 1000,
-            echeance: "28 septembre 2025",
-        },
-        {
-            id: 5,
-            date_pret: "10 août 2025",
-            investisseur: "Investisseur 1",
-            montant_pret: 1000,
-            echeance: "28 septembre 2025",
-        },
-    ]
-
 
 
     // Formatage de la date pour mobile
@@ -71,7 +33,7 @@ export default function InvestissementList() {
     return (
         <div className="">
             <Card className="shadow-lg border-0">
-                <CardHeader className="">
+                <CardHeader>
                     <CardTitle>
                         <div className="flex justify-between items-center">
                             <p className="font-bold text-sm md:text-xl lg:text-2xl">Liste des investissements</p>
@@ -81,6 +43,9 @@ export default function InvestissementList() {
                                 <FilterPeriode />
                                 <FilterRestaurant />
                             </div>
+                        </div>
+                        <div className="flex justify-end">
+                            <AddInvestModal />
                         </div>
                     </CardTitle>
                 </CardHeader>
@@ -108,21 +73,20 @@ export default function InvestissementList() {
 
                                         <TableCell className="text-center">
                                             <span className={` text-xs capitalize `}>
-                                                {investissement.echeance} 
+                                                {investissement.echeance}
                                             </span>
                                         </TableCell>
-                                      
+
                                         <TableCell className="text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
+                                                    <Button className="bg-red-400 hover:bg-red-600 cursor-pointer ">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem className="flex items-center gap-2">
-                                                        <Eye className="h-4 w-4" />
-                                                        Voir détails
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                        <InvestDetailModal investissement={investissement} />
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -156,8 +120,7 @@ export default function InvestissementList() {
                                     </div>
                                     <div className="text-center">
                                         <button className="flex items-center px-3 py-1.5 text-xs border border-input rounded-md bg-background hover:bg-accent hover:text-accent-foreground">
-                                            <Eye className="h-4 w-4 mr-1" />
-                                            <span className="hidden md:inline">Détails</span>
+                                            <InvestDetailModal investissement={investissement} />
                                         </button>
                                     </div>
                                 </div>

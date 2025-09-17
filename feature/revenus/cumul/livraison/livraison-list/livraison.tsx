@@ -1,3 +1,5 @@
+
+"use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Table,
@@ -17,57 +19,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import FilterRestaurant from "@/feature/revenus/filtres/restaurant/filter-restaurant"
 import FilterPeriode from "@/feature/revenus/filtres/periode/filter-periode"
+import { LivraisonDetailModal } from "./livraison-detail-modal"
+import { livraisons } from "./data"
 export default function LivraisonList() {
-
-    const livraisons = [
-        {
-            id: 1,
-            date: "28 septembre 2025",
-            nomLivreur: "Livreur 1",
-            numeroLivraison: "123456",
-            numeroCommande: "123456",
-            restaurant: "Restaurant 1",
-            montant: "1000",
-
-        },
-        {
-            id: 2,
-            date: "20 août 2025",
-            nomLivreur: "Livreur 1",
-            numeroLivraison: "123456",
-            numeroCommande: "123456",
-            restaurant: "Restaurant 1",
-            montant: "1000",
-        },
-        {
-            id: 3,
-            date: "15 août 2025",
-            nomLivreur: "Livreur 1",
-            numeroLivraison: "123456",
-            numeroCommande: "123456",
-            restaurant: "Restaurant 1",
-            montant: "1000",
-        },
-        {
-            id: 4,
-            date: "10 août 2025",
-            nomLivreur: "Livreur 1",
-            numeroLivraison: "123456",
-            numeroCommande: "123456",
-            restaurant: "Restaurant 1",
-            montant: "1000",
-        },
-        {
-            id: 5,
-            date: "10 août 2025",
-            nomLivreur: "Livreur 1",
-            numeroLivraison: "123456",
-            numeroCommande: "123456",
-            restaurant: "Restaurant 1",
-            montant: "1000",
-        },
-    ]
-
 
 
     // Formatage de la date pour mobile
@@ -85,9 +39,9 @@ export default function LivraisonList() {
                             <div
                                 className="grid grid-cols-1 md:grid-cols-2 gap-2 font-normal font-exo text-sm"
                             >
-                               <FilterPeriode/>
-                               <FilterRestaurant/>
-                            </div>  
+                                <FilterPeriode />
+                                <FilterRestaurant />
+                            </div>
                         </div>
                     </CardTitle>
                 </CardHeader>
@@ -97,49 +51,42 @@ export default function LivraisonList() {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-red-500 hover:bg-red-600">
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Date</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Nom Livreur</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Numero Livraison</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Numero Commande</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Restaurant</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Montant</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Actions</TableHead>
+                                    <TableHead className="font-semibold text-white text-center hover:text-white capitalize">Reference</TableHead>
+                                    <TableHead className="font-semibold text-white text-center hover:text-white capitalize">Date et heure</TableHead>
+                                    <TableHead className="font-semibold text-white text-center hover:text-white capitalize">Livreur</TableHead>
+                                    <TableHead className="font-semibold text-white text-center hover:text-white capitalize">Coût Livraison</TableHead>
+                                    <TableHead className="font-semibold text-white text-center hover:text-white capitalize">Coût commande</TableHead>
+                                    <TableHead className="font-semibold text-white text-center hover:text-white capitalize">Commission(%)</TableHead>
+                                    <TableHead className="font-semibold text-white text-center hover:text-white capitalize">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {livraisons.map((livraison) => (
                                     <TableRow key={livraison.id} className="transition-colors">
+                                        <TableCell className="font-medium text-center">{livraison.reference}</TableCell>
                                         <TableCell className="font-medium text-center">{livraison.date}</TableCell>
-                                        <TableCell className="font-semibold text-center">{livraison.nomLivreur}</TableCell>
-                                        <TableCell className="text-center">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize `}>{livraison.numeroLivraison}</span>
+                                        <TableCell className="font-medium text-center">
+                                            {livraison.nomLivreur}
                                         </TableCell>
-                                        <TableCell className="text-center">
-                                            <span className={` text-xs capitalize `}>
-                                                {livraison.numeroCommande}
-                                            </span>
+                                        <TableCell className="font-medium text-center">
+                                            {livraison.coutLivraison}
                                         </TableCell>
-                                        <TableCell className="text-center">
-                                            <span className={` text-xs capitalize `}>
-                                                {livraison.restaurant}
-                                            </span>
+                                        <TableCell className="font-medium text-center">
+                                            {livraison.coutCommande}
                                         </TableCell>
-                                        <TableCell className="text-center">
-                                            <span className={` text-xs capitalize `}>
-                                                {livraison.montant} XOF
-                                            </span>
+                                        <TableCell className="font-medium text-center">
+                                            10%({livraison.commission} XOF)
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
+                                                    <Button className="bg-red-400 hover:bg-red-600 cursor-pointer ">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem className="flex items-center gap-2">
-                                                        <Eye className="h-4 w-4" />
-                                                        Voir détails
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                        <LivraisonDetailModal livraison={livraison} />
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -159,29 +106,30 @@ export default function LivraisonList() {
                             >
                                 <div className="flex justify-between items-start mb-3">
                                     <div>
-                                        <p className="text-sm text-muted-foreground">{livraison.date}</p>
-                                        <h3 className="font-semibold text-sm md:text-lg">{livraison.nomLivreur}</h3>
+                                        <p className="text-sm text-muted-foreground">{livraison.reference}</p>
+                                        <h3 className="font-semibold text-sm md:text-lg">{livraison.date}</h3>
                                     </div>
                                     <span className="px-2 py-1 rounded text-xs font-semibold bg-muted text-muted-foreground">
-                                        {livraison.numeroLivraison}
+                                        {livraison.nomLivreur}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center gap-4 text-sm mt-2">
                                     <div>
-                                        <span className="text-muted-foreground">Restaurant:</span>
-                                        <span className="font-bold ml-2 text-primary">{livraison.restaurant}</span>
+                                        <span className="text-muted-foreground">Coût livraison:</span>
+                                        <span className="font-bold ml-2 text-primary">{livraison.coutLivraison}</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-muted-foreground">Coût commande:</span>
+                                        <span className="font-bold ml-2 text-primary">{livraison.coutCommande}</span>
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center gap-4 text-sm mt-2">
                                     <div>
-                                        <span className="text-muted-foreground">Montant:</span>
-                                        <span className="font-bold ml-2 text-primary">{livraison.montant}</span>
+                                        <span className="text-muted-foreground">Commission(%):</span>
+                                        <span className="font-bold ml-2 text-primary">10%({livraison.commission} XOF)</span>
                                     </div>
-                                    <div className="text-center">
-                                        <button className="flex items-center px-3 py-1.5 text-xs border border-input rounded-md bg-background hover:bg-accent hover:text-accent-foreground">
-                                            <Eye className="h-4 w-4 mr-1" />
-                                            <span className="hidden md:inline">Détails</span>
-                                        </button>
+                                    <div className="text-center cursor-pointer ">
+                                        <LivraisonDetailModal livraison={livraison}/>
                                     </div>
                                 </div>
                             </div>

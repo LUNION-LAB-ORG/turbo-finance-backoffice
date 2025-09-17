@@ -133,7 +133,7 @@ export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {
                                     <button
                                         onClick={() => toggleSubmenu(item.name)}
                                         className={cn(
-                                            "flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                                            "flex items-center justify-between w-full px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer",
                                             isActive
                                                 ? "bg-red-500 text-white"
                                                 : "text-muted-foreground hover:bg-accent hover:text-foreground"

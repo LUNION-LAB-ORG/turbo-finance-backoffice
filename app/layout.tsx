@@ -1,11 +1,12 @@
 // app/layout.tsx
 import type { Metadata } from "next"
-import { Exo } from "next/font/google"
+  import { Roboto } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import Layout from "@/components/layout/layout"
 
-const exo = Exo({
+
+const roboto = Roboto({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   display: "swap", 
@@ -23,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className={exo.className} suppressHydrationWarning>
+    <html lang="fr" className={roboto.className} suppressHydrationWarning>
       <body>
         <ThemeProvider
           attribute="class"

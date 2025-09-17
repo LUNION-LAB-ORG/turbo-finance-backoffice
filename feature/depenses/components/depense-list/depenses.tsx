@@ -18,45 +18,8 @@ import {
 import { CreerDepenseModal } from "./creer-depense"
 import FilterDepenses from "../filtres/depenses/depenses.filters"
 import FilterCategorie from "../filtres/categorie/categorie.filters"
-
-const depenses = [
-    {
-        id: 1,
-        date: "28 septembre 2025",
-        libelle: "Salaires du personnel",
-        categories: "Salaires",
-        montant: "1000",
-
-    },
-    {
-        id: 2,
-        date: "20 août 2025",
-        libelle: "Entretien du terrain",
-        categories: "Entretien",
-        montant: "1000",
-    },
-    {
-        id: 3,
-        date: "15 août 2025",
-        libelle: "Transport du personnel",
-        categories: "Transport",
-        montant: "1000",
-    },
-    {
-        id: 4,
-        date: "10 août 2025",
-        libelle: "Energie",
-        categories: "Energie",
-        montant: "1000",
-    },
-    {
-        id: 5,
-        date: "10 août 2025",
-        libelle: "Autres",
-        categories: "Autres",
-        montant: "1000",
-    },
-]
+import { depenses } from "./data"
+import { DepenseDetailModal } from "./detail/depenses-detail"
 
 export function DepenseList() {
     // Couleur des résultats
@@ -133,14 +96,13 @@ export function DepenseList() {
                                         <TableCell className="text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="sm">
+                                                    <Button className="bg-red-400 hover:bg-red-600 cursor-pointer ">
                                                         <MoreHorizontal className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem className="flex items-center gap-2">
-                                                        <Eye className="h-4 w-4" />
-                                                        Voir détails
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                        <DepenseDetailModal depense={depense} />
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>

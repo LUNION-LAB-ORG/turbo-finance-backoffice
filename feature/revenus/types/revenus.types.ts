@@ -15,3 +15,38 @@ export interface Facture {
     paiements: PaiementPartiel[];
     montantPaye: number;
 }
+
+export interface Livraison {
+    id: number;
+    reference: string;
+    date: string;
+    nomLivreur: string;
+    coutLivraison: string;
+    coutCommande: string;
+    commission: string;
+}
+
+export interface Investissement {
+    id: number;
+    date_pret: string;
+    investisseur: string;
+    montant_pret: string;
+    echeance: string;
+}
+
+export interface CommissionFixe {
+    id: number,
+    date: string,
+    restaurant: string,
+    localisation: string,
+    commission: string,
+}
+
+export interface CommissionVariable {
+    id: number,
+    date: string,
+    restaurant: string,
+    localisation: string,
+    montant_commande: string,
+    commission: string,
+}
