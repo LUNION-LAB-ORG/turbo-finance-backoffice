@@ -11,74 +11,111 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
 import { Plus } from "lucide-react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { CategorieDepenseCreateDTO } from "../../schemas/categorie-depense.schema"
+import { CategorieDepenseCreateSchema } from "../../schemas/categorie-depense.schema"
+import { useAjouterCategorieDepenseMutation } from "../../queries/category/categorie-depense-mutation.query"
+import { useState } from "react" // Import ajouté
+import { toast } from "sonner"
 
 export function CreerCategorieModal() {
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+    const [open, setOpen] = useState(false) // État pour contrôler la fermeture du dialogue
+    
+    // Configuration du formulaire avec react-hook-form et zod
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+        reset,
+        setValue,
+    } = useForm<CategorieDepenseCreateDTO>({
+        resolver: zodResolver(CategorieDepenseCreateSchema),
+        defaultValues: {
+            nomCategorie: '',
+            description: '',
+        },
+    })
+    
+    // Utilisation de la mutation pour créer une dépense
+    const ajouterCategorieDepenseMutation = useAjouterCategorieDepenseMutation()
+
+    // Gestion de la soumission du formulaire
+    const onSubmit = async (data: CategorieDepenseCreateDTO) => {
+        console.log("onSubmit appelé avec les données:", data)
+        try {
+            const formData = {
+                nomCategorie: data.nomCategorie,
+                description: data.description,
+            }
+
+            await ajouterCategorieDepenseMutation.mutateAsync(formData)
+          
+            // Réinitialiser le formulaire et fermer le dialogue
+            reset()
+            setOpen(false) // Fermer le dialogue après succès
+            
+            // Afficher un toast de succès
+            toast.success("Catégorie créée avec succès", {
+                description: `La catégorie "${formData.nomCategorie}" a été ajoutée avec succès`,
+                duration: 4000,
+            })
+            
+        } catch (error) {
+            console.error("Erreur lors de la création de la dépense:", error)
+        }
+    }
 
     return (
-        <Dialog >
-            <form className="w-full">
-                <DialogTrigger asChild>
-                    <Button
-                        variant="default"
-                        className="cursor-pointer flex items-center gap-1 md:gap-2"
-                    >
-                        <Plus />Ajouter <span className="hidden md:flex"> une categorie</span>
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-[95%] sm:max-w-[600px] w-full mt-3 sm:mt-3 md:mt-0">
-                    <DialogHeader>
-                        <DialogTitle>Ajouter une categorie</DialogTitle>
-                        <DialogDescription>
-                            Ajoutez une nouvelle categorie
-                        </DialogDescription>
-                    </DialogHeader>
-
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white flex items-center gap-1 md:gap-2"
+                >
+                    <Plus />Ajouter <span className="hidden md:flex"> une categorie</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[95%] sm:max-w-[600px] w-full mt-3 sm:mt-3 md:mt-0">
+                <DialogHeader>
+                    <DialogTitle>Ajouter une categorie</DialogTitle>
+                    <DialogDescription>
+                        Ajoutez une nouvelle categorie
+                    </DialogDescription>
+                </DialogHeader>
+                
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid gap-6">
-                        {/* Équipe adverse */}
+                        {/* Nom de la catégorie */}
                         <div className="grid gap-3">
-                            <Label htmlFor="name" className="text-sm text-gray-500">
+                            <Label htmlFor="nomCategorie" className="text-sm text-gray-500">
                                 Nom
                             </Label>
-                            <Input id="name" name="name" placeholder="Nom" />
+                            <Input 
+                                id="nomCategorie" 
+                                {...register('nomCategorie')}
+                                placeholder="Nom de la catégorie" 
+                            />
+                            {errors.nomCategorie && (
+                                <p className="text-red-500 text-sm">{errors.nomCategorie.message}</p>
+                            )}
                         </div>
 
-                        {/* Date et heure */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="flex flex-col gap-1">
-                                <Label htmlFor="date" className="text-sm text-gray-500">
-                                    Date de la création de la categorie
-                                </Label>
-                                <CalendarInput
-                                    value={selectedDate}
-                                    onChange={(date) => setSelectedDate(date)}
-                                    placeholder="Sélectionnez une date"
-                                />
-                            </div>
-                        
-                            
-                        </div>
-
-                    
-                        {/* Stade */}
+                        {/* Description */}
                         <div className="grid gap-3">
                             <Label htmlFor="description" className="text-sm text-gray-500">
-                               Description
+                                Description
                             </Label>
-                            <Input id="description" name="description" placeholder="Description" />
+                            <Input 
+                                id="description" 
+                                {...register('description')}
+                                placeholder="Description" 
+                            />
+                            {errors.description && (
+                                <p className="text-red-500 text-sm">{errors.description.message}</p>
+                            )}
                         </div>
                     </div>
 
@@ -86,6 +123,7 @@ export function CreerCategorieModal() {
                     <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-4">
                         <DialogClose asChild>
                             <Button
+                                type="button"
                                 variant="outline"
                                 className="rounded-full w-full sm:w-auto cursor-pointer"
                             >
@@ -94,14 +132,14 @@ export function CreerCategorieModal() {
                         </DialogClose>
                         <Button
                             type="submit"
-                            variant="default"
-                            className="rounded-full w-full sm:w-auto px-10  cursor-pointer"
+                            className="cursor-pointer bg-amber-500 hover:bg-amber-600"
+                            disabled={isSubmitting || ajouterCategorieDepenseMutation.isPending}
                         >
-                            Créer
+                            {isSubmitting || ajouterCategorieDepenseMutation.isPending ? 'Création en cours...' : 'Ajouter'}
                         </Button>
                     </DialogFooter>
-                </DialogContent>
-            </form>
+                </form>
+            </DialogContent>
         </Dialog>
     )
 }

@@ -3,9 +3,16 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DepenseList } from "./depenses"
 import { CategorieDepenseList } from "./categorie-depense"
+import { IDepense } from "@/feature/depenses/types/depense.type"
+import { ICategorieDepense } from "@/feature/depenses/types/categorie-depense.type"
+
+interface DepenseTabsProps {
+    depenses: IDepense[];
+    categorie_depenses: ICategorieDepense[];
+}
 
 
-export default function DepenseTabs() {
+export default function DepenseTabs({ depenses, categorie_depenses }: DepenseTabsProps) {
     return (
         <div className="w-full px-4 py-6 -mt-6">
             <div className="w-full px-4 py-6 shadow-lg rounded-lg border border-gray-200">
@@ -25,10 +32,10 @@ export default function DepenseTabs() {
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="depenses-journalieres">
-                        <DepenseList />
+                        <DepenseList depenses={depenses} categorie_depenses={categorie_depenses}/>
                     </TabsContent>
                     <TabsContent value="categories-depenses">
-                        <CategorieDepenseList />
+                        <CategorieDepenseList categorie_depenses={categorie_depenses} />
                     </TabsContent>
                 </Tabs>
             </div>

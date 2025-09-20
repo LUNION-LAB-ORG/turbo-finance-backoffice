@@ -14,47 +14,52 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
+import { IDepense } from "@/feature/depenses/types/depense.type"
+import { useMemo } from "react"
 
-export const description = "Repartition des transactions"
+export const description = "Répartition des dépenses par catégorie"
 
-const chartData = [
-    { categories: "Salaires", montant: 8, fill: "#4CAF50" },
-    { categories: "Entretien", montant: 4, fill: "#F44336" },
-    { categories: "Transport", montant: 4, fill: "#FFEB3B" },
-    { categories: "Energie", montant: 4, fill: "#d3fc03" },
-    { categories: "Autres", montant: 4, fill: "#26f0e9" },
-]
+interface RepartionPieDonutDepenseProps {
+    depenses: IDepense[];
+}
+
+// Fonction pour grouper les dépenses par catégorie
+const groupDepensesByCategorie = (depenses: IDepense[]) => {
+    const categoriesMap = new Map<string, number>()
+    
+    // Parcourir toutes les dépenses et les grouper par catégorie
+    depenses.forEach(depense => {
+        const categorieName = depense.categorie?.nomCategorie || "Non catégorisé"
+        const currentAmount = categoriesMap.get(categorieName) || 0
+        categoriesMap.set(categorieName, currentAmount + depense.montant)
+    })
+    
+    // Convertir en tableau pour le graphique
+    const colors = [
+        "#4CAF50", "#F44336", "#FFEB3B", "#2196F3", 
+        "#FF9800", "#9C27B0", "#00BCD4", "#795548",
+        "#607D8B", "#E91E63", "#3F51B5", "#009688"
+    ]
+    
+    return Array.from(categoriesMap.entries()).map(([categorie, montant], index) => ({
+        categories: categorie,
+        montant,
+        fill: colors[index % colors.length]
+    }))
+}
 
 
 const chartConfig = {
     montant: {
         label: "Montant",
     },
-    salaires: {
-        label: "Salaires",
-        color: "var(--color-green)",
-    },
-    entretien: {
-        label: "Entretien",
-        color: "var(--color-red)",
-    },
-    transport: {
-        label: "Transport",
-        color: "var(--color-yellow)",
-    
-    },
-    energie: {
-        label: "Energie",
-        color: "var(--color-blue)",
-    },
-    autres: {
-        label: "Autres",
-        color: "var(--color-orange)",
-    }
-
 } satisfies ChartConfig
 
-export function RepartionPieDonutDepense() {
+export function RepartionPieDonutDepense({ depenses }: RepartionPieDonutDepenseProps) {
+    // Transformer les données des dépenses en format pour le graphique
+    const chartData = useMemo(() => {
+        return groupDepensesByCategorie(depenses)
+    }, [depenses])
     return (
         <Card className="flex flex-col w-full">
             <CardHeader className="items-center pb-0">

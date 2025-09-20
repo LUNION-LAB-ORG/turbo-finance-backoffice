@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, Calendar, User, DollarSign, Percent, Hash } from "lucide-react";
-import { Depense } from "@/feature/depenses/types/depenses.types";
+import { Eye, Calendar, User, DollarSign, Hash } from "lucide-react";
+import { IDepense } from "@/feature/depenses/types/depense.type";
 import Image from "next/image";
 interface DepenseDetailModalProps {
-    depense: Depense;
+    depense: IDepense;
 }
 
 export function DepenseDetailModal({ depense }: DepenseDetailModalProps) {
@@ -57,7 +57,6 @@ export function DepenseDetailModal({ depense }: DepenseDetailModalProps) {
                         />
                     </div>
 
-                    {/* Ligne Date */}
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="date" className="text-right flex items-center gap-2">
                             <Calendar className="h-4 w-4" />
@@ -65,48 +64,45 @@ export function DepenseDetailModal({ depense }: DepenseDetailModalProps) {
                         </Label>
                         <Input
                             id="date"
-                            defaultValue={depense.date}
+                            defaultValue={depense.dateDepense}
                             className="col-span-3"
                             readOnly
                         />
                     </div>
 
-                    {/* Ligne Livreur */}
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="livreur" className="text-right flex items-center gap-2">
+                        <Label htmlFor="libelle" className="text-right flex items-center gap-2">
                             <User className="h-4 w-4" />
                             Libelle
                         </Label>
                         <Input
-                            id="livreur"
+                            id="libelle"
                             defaultValue={depense.libelle}
                             className="col-span-3"
                             readOnly
                         />
                     </div>
 
-                    {/* Ligne Coût Livraison */}
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="coutLivraison" className=" flex items-center gap-2">
+                        <Label htmlFor="categorieId" className=" flex items-center gap-2">
                             <DollarSign className="h-4 w-4" />
                             Categories
                         </Label>
                         <Input
-                            id="coutLivraison"
-                            defaultValue={`${depense.categories}`}
+                            id="categorieId"
+                            defaultValue={`${depense.categorie.nomCategorie}`}
                             className="col-span-3"
                             readOnly
                         />
                     </div>
 
-                    {/* Ligne Coût Commande */}
                     <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="coutCommande" className=" flex items-center gap-2">
+                        <Label htmlFor="montant" className=" flex items-center gap-2">
                             <DollarSign className="h-4 w-4" />
                             Montant
                         </Label>
                         <Input
-                            id="coutCommande"
+                            id="montant"
                             defaultValue={`${depense.montant} FCFA`}
                             className="col-span-3"
                             readOnly

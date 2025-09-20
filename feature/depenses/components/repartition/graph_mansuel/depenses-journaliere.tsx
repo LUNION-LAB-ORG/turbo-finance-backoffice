@@ -8,28 +8,65 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
+import { IDepense } from "@/feature/depenses/types/depense.type"
+import { useMemo } from "react"
 
-export const description = "Depenses journaliere"
+export const description = "Dépenses journalières"
 
-const chartData = [
-    { day: "Lun", depenses: 50 },
-    { day: "Mar", depenses: 30 },
-    { day: "Mer", depenses: 20 },
-    { day: "Jeu", depenses: 70 },
-    { day: "Ven", depenses: 20 },
-    { day: "Sam", depenses: 20 },
-    { day: "Dim", depenses: 10 },
-    
-]
+interface DepensesJournaliereProps {
+    depenses: IDepense[];
+}
+
+// Fonction pour grouper les dépenses par jour de la semaine
+const groupDepensesByDay = (depenses: IDepense[]) => {
+    // Structure initiale pour tous les jours de la semaine avec valeur 0
+    const jours = [
+        { jour: 1, nom: "Lun", depenses: 0 },
+        { jour: 2, nom: "Mar", depenses: 0 },
+        { jour: 3, nom: "Mer", depenses: 0 },
+        { jour: 4, nom: "Jeu", depenses: 0 },
+        { jour: 5, nom: "Ven", depenses: 0 },
+        { jour: 6, nom: "Sam", depenses: 0 },
+        { jour: 0, nom: "Dim", depenses: 0 },
+    ]
+
+    // Parcourir toutes les dépenses et les grouper par jour de la semaine
+    depenses.forEach(depense => {
+        try {
+            const date = new Date(depense.dateDepense)
+            const dayOfWeek = date.getDay() // 0-6 (Dim-Lun)
+            
+            if (dayOfWeek >= 0 && dayOfWeek <= 6) {
+                jours.find(j => j.jour === dayOfWeek)!.depenses += depense.montant
+            }
+        } catch (error) {
+            console.warn("Erreur de format de date:", depense.dateDepense)
+        }
+    })
+
+    return jours.map(j => ({ day: j.nom, depenses: j.depenses }))
+}
 
 const chartConfig = {
     depenses: {
-        label: "Depenses journaliere",
+        label: "Dépenses journalières",
         color: "hsl(47, 81.50%, 48.80%)", 
     },
 } satisfies ChartConfig
 
-export function DepensesJournaliereChart() {
+export function DepensesJournaliereChart({ depenses }: DepensesJournaliereProps) {
+    // Transformer les données des dépenses en format pour le graphique
+    const chartData = useMemo(() => {
+        return groupDepensesByDay(depenses)
+    }, [depenses])
+
+    // Calculer le maximum pour l'échelle Y
+    const maxDepense = useMemo(() => {
+        if (chartData.length === 0) return 100
+        const max = Math.max(...chartData.map(item => item.depenses))
+        return Math.ceil(max * 1.1) // 10% de marge
+    }, [chartData])
+
     return (
             <div>
                 <div  className="pt-0">

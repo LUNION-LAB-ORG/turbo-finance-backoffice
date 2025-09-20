@@ -4,8 +4,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DepensesJournaliereChart } from "./depenses-journaliere"
 import { DepensesHebdomadaireChart } from "./depenses-hebdomadaire"
 import { DepensesChart } from "./depenses_mesuelles"
+import { IDepense } from "@/feature/depenses/types/depense.type"
 
-export default function DepenseQuotidienne() {
+interface DepenseQuotidienneProps {
+    depenses: IDepense[];
+}
+
+export default function DepenseQuotidienne({ depenses }: DepenseQuotidienneProps) {
     return (
         <div className="w-full px-4 py-6 -mt-6">
             <div className="w-full px-4 py-6 shadow-lg rounded-lg border border-gray-200">
@@ -18,15 +23,15 @@ export default function DepenseQuotidienne() {
                         <TabsTrigger value="depenses-mensuelle" className="data-[state=active]:bg-red-500 data-[state=active]:text-white dark:data-[state=active]:bg-red-600 dark:data-[state=active]:text-white">Mois</TabsTrigger>
                     </TabsList>
                     <TabsContent value="depenses-journaliere">
-                        <DepensesJournaliereChart />
+                        <DepensesJournaliereChart depenses={depenses} />
                     </TabsContent>
                     <TabsContent value="depenses-hebdomadaire">
-                        <DepensesHebdomadaireChart />
+                        <DepensesHebdomadaireChart depenses={depenses}/>
                     </TabsContent>
                     <TabsContent value="depenses-mensuelle">
-                        <DepensesChart />
+                        <DepensesChart depenses={depenses}/>
                     </TabsContent>
-                </Tabs>
+                </Tabs> 
             </div>
         </div>
     )

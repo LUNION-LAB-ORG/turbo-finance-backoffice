@@ -8,32 +8,74 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
+import { IDepense } from "@/feature/depenses/types/depense.type"
+import { useMemo } from "react"
 
-export const description = "Depenses hebdomadaire"
+export const description = "Dépenses hebdomadaires"
 
-const chartData = [
-    { week: "S1", depenses: 50 },
-    { week: "S2", depenses: 30 },
-    { week: "S3", depenses: 20 },
-    { week: "S4", depenses: 70 },
-    { week: "S5", depenses: 20 },
-    { week: "S6", depenses: 20 },
-    { week: "S7", depenses: 10 },
-    { week: "S8", depenses: 20 },
-    { week: "S9", depenses: 20 },
-    { week: "S10", depenses: 10 },
-    { week: "S11", depenses: 20 },
-    { week: "S12", depenses: 20 },
-]
+interface DepensesHebdomadaireProps {
+    depenses: IDepense[];
+}
+
+// Fonction pour grouper les dépenses par semaine de l'année
+const groupDepensesByWeek = (depenses: IDepense[]) => {
+    // Structure initiale pour 52 semaines avec valeur 0
+    const semaines: { semaine: number; nom: string; depenses: number }[] = []
+    for (let i = 1; i <= 52; i++) {
+        semaines.push({ semaine: i, nom: `S${i}`, depenses: 0 })
+    }
+
+    // Parcourir toutes les dépenses et les grouper par semaine
+    depenses.forEach(depense => {
+        try {
+            const date = new Date(depense.dateDepense)
+            const weekNumber = getWeekNumber(date)
+            
+            if (weekNumber >= 1 && weekNumber <= 52) {
+                semaines[weekNumber - 1].depenses += depense.montant
+            }
+        } catch (error) {
+            console.warn("Erreur de format de date:", depense.dateDepense)
+        }
+    })
+
+    // Filtrer pour ne garder que les semaines qui ont des dépenses ou les 12 premières semaines
+    const semainesAvecDepenses = semaines.filter(s => s.depenses > 0)
+    if (semainesAvecDepenses.length === 0) {
+        return semaines.slice(0, 12).map(s => ({ week: s.nom, depenses: s.depenses }))
+    }
+    
+    return semainesAvecDepenses.slice(0, 12).map(s => ({ week: s.nom, depenses: s.depenses }))
+}
+
+// Fonction pour obtenir le numéro de la semaine
+const getWeekNumber = (date: Date) => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+    const dayNum = d.getUTCDay() || 7
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum)
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+    return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
+}
 
 const chartConfig = {
     depenses: {
-        label: "Depenses hebdomadaire",
+        label: "Dépenses hebdomadaires",
         color: "hsl(142, 75.20%, 44.30%)", 
     },
 } satisfies ChartConfig
 
-export function DepensesHebdomadaireChart() {
+export function DepensesHebdomadaireChart({ depenses }: DepensesHebdomadaireProps) {
+    // Transformer les données des dépenses en format pour le graphique
+    const chartData = useMemo(() => {
+        return groupDepensesByWeek(depenses)
+    }, [depenses])
+
+    // Calculer le maximum pour l'échelle Y
+    const maxDepense = useMemo(() => {
+        if (chartData.length === 0) return 100
+        const max = Math.max(...chartData.map(item => item.depenses))
+        return Math.ceil(max * 1.1) // 10% de marge
+    }, [chartData])
     return (
             <div>
                 <div  className="pt-0">
@@ -69,7 +111,7 @@ export function DepensesHebdomadaireChart() {
                                 tickMargin={8}
                                 tickCount={6}
                                 tickFormatter={(value) => value}
-                                domain={[0, 'dataMax + 2']}
+                                domain={[0, maxDepense]}
                                 tick={{ fontSize: 12, fill: "#6b7280" }}
                             />
                             <ChartTooltip
@@ -93,7 +135,7 @@ export function DepensesHebdomadaireChart() {
                         </AreaChart>
                     </ChartContainer>
                     <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                        <span>Depenses hebdomadaire(millions)</span>
+                        <span>Dépenses hebdomadaires (FCFA)</span>
                         <span>Semaine</span>
                     </div>
                 </div>

@@ -23,103 +23,232 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import { toast } from "sonner"
+import { ajouterDepenseAction } from "../../actions/depense.action"
+import { obtenirCategoriesDepensesActiveAction } from "../../actions/categorie-depense.action"
+import { useQuery } from "@tanstack/react-query"
+import { DepenseCreateSchema } from "../../schemas/depense.schema"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { DepenseCreateDTO } from "../../schemas/depense.schema"
+import { ICategorieDepense } from "../../types/categorie-depense.type"
+import { IDepense } from "../../types/depense.type"
 import { Plus } from "lucide-react"
+import { useAjouterCategorieDepenseMutation } from "../../queries/category/categorie-depense-mutation.query"
+import { useCategorieDepensesListQuery } from "../../queries/category/categorie-depense.query"
+import { useAjouterDepenseMutation } from "../../queries/depense.mutation"
 
-export function CreerDepenseModal() {
+interface DepensesProps {
+    depenses: IDepense[];   
+}
+
+export function CreerDepenseModal({ depenses }: DepensesProps) {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
+    const [isOpen, setIsOpen] = useState(false)
+    
+    // Récupération des catégories actives
+    const { data: categories, isLoading: categoriesLoading } = useCategorieDepensesListQuery({ params: {} })
+    
+
+    // Configuration du formulaire avec react-hook-form et zod
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+        reset,
+        setValue,
+        watch,
+    } = useForm<DepenseCreateDTO>({
+        resolver: zodResolver(DepenseCreateSchema),
+        defaultValues: {
+            libelle: '',
+            montant: 0,
+            description: '',
+            dateDepense: '',
+            categorie: {
+                id: ''
+            }
+        },
+    })
+
+    // Utilisation de la mutation pour créer une dépense
+    const ajouterDepenseMutation = useAjouterDepenseMutation()  
+
+    // Gestion de la soumission du formulaire
+    const onSubmit = async (data: DepenseCreateDTO) => {
+        try {
+            // Formater la date si elle est sélectionnée
+            const formData = {
+                ...data,
+                dateDepense: selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                // S'assurer que categorie est un objet avec id
+                categorie: {
+                    id: data.categorie.id
+                }
+            }
+
+            console.log("Données envoyées:", formData);
+
+            const result = await ajouterDepenseAction(formData)
+            
+            if (result.success) {
+                toast.success("Dépense créée avec succès!")
+                reset()
+                setSelectedDate(undefined)
+                setIsOpen(false)
+                // Rafraîchir la liste des dépenses
+                window.location.reload()
+            } else {
+                toast.error(result.error || "Erreur lors de la création de la dépense")
+            }
+        } catch (error) {
+            console.error("Erreur complète:", error);
+            toast.error("Une erreur est survenue lors de la création de la dépense")
+        }
+    }
 
     return (
-        <Dialog >
-            <form className="w-full">
-                <DialogTrigger asChild>
-                    <Button
-                        variant="default"
-                        className="cursor-pointer flex items-center gap-1 md:gap-2 bg-amber-500 text-white hover:bg-amber-600 hover:text-white"
-                    >
-                        <Plus />Ajouter <span className="hidden md:flex"> une depense</span>
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-[95%] sm:max-w-[600px] w-full mt-3 sm:mt-3 md:mt-0">
-                    <DialogHeader>
-                        <DialogTitle>Ajouter une depense</DialogTitle>
-                        <DialogDescription>
-                            Ajoutez une nouvelle depense
-                        </DialogDescription>
-                    </DialogHeader>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    variant="default"
+                    className="cursor-pointer flex items-center gap-1 md:gap-2 bg-amber-500 text-white hover:bg-amber-600 hover:text-white"
+                >
+                    <Plus />Ajouter <span className="hidden md:flex"> une depense</span>
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[95%] sm:max-w-[600px] w-full mt-3 sm:mt-3 md:mt-0">
+                <DialogHeader>
+                    <DialogTitle>Ajouter une depense</DialogTitle>
+                    <DialogDescription>
+                        Ajoutez une nouvelle depense
+                    </DialogDescription>
+                </DialogHeader>
 
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid gap-6">
-                        {/* Équipe adverse */}
+                        {/* Libelle */}
                         <div className="grid gap-3">
-                            <Label htmlFor="name-1" className="text-sm text-gray-500">
-                                Libelle
+                            <Label htmlFor="libelle" className="text-sm text-gray-500">
+                                Libelle *
                             </Label>
-                            <Input id="name-1" name="name" placeholder="Libelle" />
+                            <Input 
+                                id="libelle" 
+                                placeholder="Libelle de la dépense"
+                                {...register('libelle')}
+                            />
+                            {errors.libelle && (
+                                <p className="text-red-500 text-sm">{errors.libelle.message}</p>
+                            )}
                         </div>
 
-                        {/* Date et heure */}
+                        {/* Date et catégorie */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div className="flex flex-col gap-1">
-                                <Label htmlFor="date-1" className="text-sm text-gray-500">
-                                    Date de la depense
+                                <Label htmlFor="dateDepense" className="text-sm text-gray-500">
+                                    Date de la depense *
                                 </Label>
                                 <CalendarInput
                                     value={selectedDate}
-                                    onChange={(date) => setSelectedDate(date)}
+                                    onChange={(date) => {
+                                        setSelectedDate(date)
+                                        if (date) {
+                                            setValue('dateDepense', date.toISOString().split('T')[0])
+                                        }
+                                    }}
                                     placeholder="Sélectionnez une date"
                                 />
+                                {errors.dateDepense && (
+                                    <p className="text-red-500 text-sm">{errors.dateDepense.message}</p>
+                                )}
                             </div>
                             <div className="flex flex-col gap-1">
-                                <Label htmlFor="stade-1" className="text-sm text-gray-500">
-                                    Catégorie de dépenses
+                                <Label htmlFor="categorie.id" className="text-sm text-gray-500">
+                                    Catégorie de dépenses *
                                 </Label>
-                                <Select>
+                                <Select 
+                                    onValueChange={(value) => setValue('categorie.id', value)}
+                                >
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Sélectionnez un lieu" />
+                                        <SelectValue placeholder="Sélectionnez une catégorie" />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectLabel>Categorie</SelectLabel>
-                                            <SelectItem value="salaire">Salaire</SelectItem>
-                                            <SelectItem value="entretien">Entretien</SelectItem>
+                                            <SelectLabel>Catégories</SelectLabel>
+                                            {categoriesLoading ? (
+                                                <SelectItem value="loading" disabled>Chargement...</SelectItem>
+                                            ) : categories && categories.length > 0 ? (
+                                                categories.map((categorie: ICategorieDepense) => (
+                                                    <SelectItem key={categorie.id} value={categorie.id}>
+                                                        {categorie.nomCategorie}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <SelectItem value="none" disabled>Aucune catégorie disponible</SelectItem>
+                                            )}
                                         </SelectGroup>
                                     </SelectContent>
                                 </Select>
+                                {errors.categorie?.id && (
+                                    <p className="text-red-500 text-sm">{errors.categorie.id.message}</p>
+                                )}
                             </div>
-                            
                         </div>
 
-                    
-                        {/* Stade */}
-                        <div className="grid gap-3">
+                        {/* Montant */}
                         <div className="grid gap-3">
                             <Label htmlFor="montant" className="text-sm text-gray-500">
-                                Montant de la depense
+                                Montant de la depense *
                             </Label>
-                            <Input id="montant" name="montant" placeholder="Montant" type="number" />
+                            <Input 
+                                id="montant" 
+                                placeholder="Montant" 
+                                type="number" 
+                                step="0.01"
+                                {...register('montant', { valueAsNumber: true })}
+                            />
+                            {errors.montant && (
+                                <p className="text-red-500 text-sm">{errors.montant.message}</p>
+                            )}
                         </div>
+
+                        {/* Description (optionnelle) */}
+                        <div className="grid gap-3">
+                            <Label htmlFor="description" className="text-sm text-gray-500">
+                                Description
+                            </Label>
+                            <Input 
+                                id="description" 
+                                placeholder="Description (optionnelle)"
+                                {...register('description')}
+                            />
+                            {errors.description && (
+                                <p className="text-red-500 text-sm">{errors.description.message}</p>
+                            )}
                         </div>
                     </div>
 
                     {/* Footer */}
-                    <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2 sm:gap-4">
+                    <DialogFooter className="mt-4 flex flex-col sm:flex-row gap-2">
                         <DialogClose asChild>
-                            <Button
-                                variant="outline"
-                                className="rounded-full w-full sm:w-auto cursor-pointer"
+                            <Button 
+                                variant="outline" 
+                                className="cursor-pointer rounded-full w-full sm:w-auto"
+                                type="button"
                             >
                                 Annuler
                             </Button>
                         </DialogClose>
-                        <Button
-                            type="submit"
-                            variant="default"
-                            className="rounded-full w-full sm:w-auto px-10  cursor-pointer"
+                        <Button 
+                            type="submit" 
+                            className="cursor-pointer bg-amber-500 hover:bg-amber-600 rounded-full w-full sm:w-auto px-10"
+                            disabled={isSubmitting || ajouterDepenseMutation.isPending}
                         >
-                            Programmer
+                            {isSubmitting || ajouterDepenseMutation.isPending ? 'Création en cours...' : 'Ajouter'}
                         </Button>
                     </DialogFooter>
-                </DialogContent>
-            </form>
+                </form>
+            </DialogContent>
         </Dialog>
     )
 }

@@ -1,164 +1,113 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import { Eye, MoreHorizontal } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { CreerDepenseModal } from "./creer-depense"
-import FilterDepenses from "../filtres/depenses/depenses.filters"
-import FilterCategorie from "../filtres/categorie/categorie.filters"
-import { depenses } from "./data"
-import { DepenseDetailModal } from "./detail/depenses-detail"
+import { useState, useMemo } from "react"
+import { IDepense } from "@/feature/depenses/types/depense.type"
+import { ICategorieDepense } from "@/feature/depenses/types/categorie-depense.type"
+import { DepensesFilters } from "../filtres/depenses"
+import { DepensesTable } from "./depenses-table"
+import { Pagination } from "./pagination"
 
-export function DepenseList() {
-    // Couleur des résultats
-    const getCategoriesStyle = (categories: string) => {
-        switch (categories) {
-            case "Salaires":
-                return "bg-green-100 text-green-800 border border-green-200"
-            case "Entretien":
-                return "bg-red-100 text-red-800 border border-red-200"
-            case "Transport":
-                return "bg-yellow-100 text-yellow-800 border border-yellow-200"
-            case "Energie":
-                return "bg-blue-100 text-blue-800 border border-blue-200"
-            case "Autres":
-                return "bg-gray-100 text-gray-800 border border-gray-200"
-            default:
-                return "bg-purple-100 text-gray-800 border border-gray-200"
-        }
+
+interface IDepenseListProps {
+  depenses: IDepense[];
+  categorie_depenses: ICategorieDepense[];
+}
+
+export function DepenseList({ depenses, categorie_depenses }: IDepenseListProps) {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  const [filters, setFilters] = useState({
+    categorie: '',
+    description: '',
+    montant: '',
+    dateDepense: ''
+  })
+
+  const handleFilterChange = (filterName: string, value: string) => {
+    setFilters(prev => ({ ...prev, [filterName]: value }))
+    setCurrentPage(1)
+  }
+
+  const filteredDepenses = useMemo(() => {
+    return depenses.filter(depense => {
+      if (filters.categorie && depense.categorie.id !== filters.categorie) return false
+      if (filters.description && !depense.libelle.toLowerCase().includes(filters.description.toLowerCase())) return false
+      if (filters.montant) {
+        const montantValue = parseFloat(filters.montant)
+        if (isNaN(montantValue) || depense.montant !== montantValue) return false
+      }
+      if (filters.dateDepense) {
+        const depenseDate = new Date(depense.dateDepense).toISOString().split('T')[0]
+        if (depenseDate !== filters.dateDepense) return false
+      }
+      return true
+    })
+  }, [depenses, filters])
+
+  const totalPages = Math.ceil(filteredDepenses.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const currentDepenses = filteredDepenses.slice(startIndex, startIndex + itemsPerPage)
+
+  const getCategoriesStyle = (categorieName: string) => {
+    const colors = ["bg-red-500 text-white","bg-green-500 text-white","bg-blue-500 text-white","bg-yellow-500 text-white","bg-pink-500 text-white","bg-purple-500 text-white"]
+    const hash = categorieName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+    return colors[hash % colors.length]
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ""
+    try {
+      return new Date(dateString).toLocaleDateString('fr-FR')
+    } catch {
+      return dateString
     }
+  }
 
-    // Formatage de la date pour mobile
-    const formatDateForMobile = (date: string) => {
-        return date.split(' ')[0] + ' ' + date.split(' ')[1].charAt(0)
-    }
+  const formatMontant = (montant: number) => new Intl.NumberFormat('fr-FR').format(montant)
 
-    return (
-        <div className="w-full px-4 py-6">
-            <Card className="shadow-lg border-0">
-                <CardHeader className="">
-                    <CardTitle>
-                        <div className="flex justify-around items-center">
-                            <p className="font-bold text-sm md:text-2xl">Liste des depenses</p>
-                            <div
-                                className="flex items-center gap-2 font-normal font-exo text-sm"
-                            >
-                                <FilterDepenses />
+  return (
+    <div className="w-full px-4 py-6">
+      <Card className="shadow-lg border-0">
+        <CardHeader className="bg-blue-50">
+          <CardTitle>
+            <div className="flex flex-col lg:flex-row justify-between items-center gap-4">
+              <h2 className="font-bold text-xl text-blue-800">Liste des dépenses</h2>
+              <DepensesFilters 
+                filters={filters}
+                handleFilterChange={handleFilterChange}
+                categorie_depenses={categorie_depenses}
+                depenses={depenses}
+              />
+            </div>
+          </CardTitle>
+        </CardHeader>
 
-                            </div>
-                            <div>
-                                <FilterCategorie />
-                            </div>
-                            <div>
-                                <CreerDepenseModal />
-                            </div>
-                        </div>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    {/* Version Desktop */}
-                    <div className="hidden md:block">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-red-500 hover:bg-red-600">
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Date</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Libelle</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Categories</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Montant</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {depenses.map((depense) => (
-                                    <TableRow key={depense.id} className="transition-colors">
-                                        <TableCell className="font-medium text-center">{depense.date}</TableCell>
-                                        <TableCell className="font-semibold text-center">{depense.libelle}</TableCell>
-                                        <TableCell className="text-center">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${getCategoriesStyle(depense.categories)}`}>{depense.categories}</span>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <span className={` text-xs capitalize `}>
-                                                {depense.montant} FCFA
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button className="bg-red-400 hover:bg-red-600 cursor-pointer ">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                                        <DepenseDetailModal depense={depense} />
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </div>
+        <CardContent className="p-0">
+          <DepensesTable 
+            depenses={currentDepenses}
+            getCategoriesStyle={getCategoriesStyle}
+            formatDate={formatDate}
+            formatMontant={formatMontant}
+          />
 
-                    {/* Version Mobile */}
-                    <div className="md:hidden space-y-4 p-4">
-                        {depenses.map((depense) => (
-                            <div key={depense.id} className="bg-white border rounded-lg p-4 shadow-sm">
-                                <div className="flex justify-between items-start mb-3">
-                                    <div>
-                                        <p className="text-sm text-gray-500">{depense.date}</p>
-                                        <h3 className="font-semibold text-sm md:text-lg">{depense.libelle}</h3>
-                                    </div>
-                                    <span className={`px-2 py-1 rounded text-xs font-semibold ${getCategoriesStyle(depense.categories)}`}>
-                                        {depense.categories}
-                                    </span>
-                                </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredDepenses.length}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={(val) => { setItemsPerPage(val); setCurrentPage(1) }}
+          />
 
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <span className="text-gray-600">Montant:</span>
-                                        <span className="font-bold ml-2">{depense.montant}</span>
-                                    </div>
-                                    <div className="text-center">
-                                        <Button variant="outline" size="sm">
-                                            <Eye className="h-4 w-4 mr-1" />
-                                            <span className="hidden md:flex">Détails</span>
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Pagination */}
-                    <div className="flex justify-between items-center p-4 border-t">
-                        <p className="text-sm text-gray-600">
-                            Affichage de 1 à {depenses.length} sur {depenses.length} depenses
-                        </p>
-                        <div className="flex gap-2">
-                            <Button variant="outline" size="sm" disabled>
-                                Précédent
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                Suivant
-                            </Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    )
+          {filteredDepenses.length === 0 && (
+            <div className="p-8 text-center text-gray-500">
+              <p>Aucune dépense trouvée</p>
+              {Object.values(filters).some(f => f) && <p className="text-sm mt-2">Essayez de modifier vos critères de recherche</p>}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
