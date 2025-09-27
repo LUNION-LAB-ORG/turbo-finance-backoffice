@@ -7,8 +7,6 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
     Home,
-    User,
-    Settings,
     ChevronLeft,
     Wallet,
     WalletCards,
@@ -17,7 +15,8 @@ import {
     Truck,
     ChartNoAxesCombined,
     Euro,
-    Layers
+    Layers,
+    Boxes
 } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -42,8 +41,9 @@ const menuItems = [
             { name: 'Cumule des investissements internes', href: '/revenue/investissement', icon: Layers },
         ]
     },
-    { name: 'Profil', href: '/profile', icon: User },
-    { name: 'Paramètres', href: '/parametre', icon: Settings },
+    { name: 'Recouvrements', href: '/recouvrement', icon: Boxes },
+    // { name: 'Profil', href: '/profile', icon: User },
+    // { name: 'Paramètres', href: '/parametre', icon: Settings },
 ];
 
 export default function Sidebar({ isOpen, toggleSidebar }: SidebarProps) {

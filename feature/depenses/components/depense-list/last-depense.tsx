@@ -102,10 +102,10 @@ export function LastDepense({ depenses }: IDepenseListProps) {
                         <div className="bg-gray-50 p-4 rounded-b-lg">
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-600">
-                                    {lastDepenses.length} dépense{lastDepenses.length > 1 ? 's' : ''} récente{lastDepenses.length > 1 ? 's' : ''}
+                                    Total des dépenses
                                 </span>
-                                <span className="font-semibold text-red-600">
-                                    Total: {lastDepenses.reduce((sum, depense) => sum + depense.montant, 0).toLocaleString()} FCFA
+                                <span className="font-semibold text-blue-600">
+                                    {depenses.reduce((sum, depense) => sum + depense.montant, 0).toLocaleString()} FCFA
                                 </span>
                             </div>
                         </div>

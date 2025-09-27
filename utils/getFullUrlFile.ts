@@ -1,18 +1,31 @@
 import { baseURL } from "@/config";
 
 /**
- * Ajoute une URL de base à un lien.
+ * Construit une URL absolue à partir d'un lien relatif ou absolu.
  *
- * @param {string} baseUrl L'URL de base (par exemple, "https://www.exemple.com/").
- * @param {string} link Le lien à compléter (par exemple, "/page.html" ou "https://www.autreexemple.com/").
- * @returns {string} Le lien complet.
+ * - Si `link` est déjà une URL absolue (http/https), on la retourne telle quelle.
+ * - Sinon, on la combine avec le `baseUrl` (par défaut celui du backend).
+ *
+ * @param {string} link Nom du fichier ou chemin relatif.
+ * @param {string} baseUrl URL de base (par défaut ton backend).
+ * @returns {string} URL absolue prête à l'emploi.
  */
 export function getFullUrlFile(link: string, baseUrl: string = baseURL) {
-    try {
-        const absoluteUrl = new URL(link, baseUrl.replace("/api/v1", ""));
-        return absoluteUrl.href;
-    } catch (e) {
-        console.error("Erreur lors de la création de l'URL : ", e);
-        return link;
+  if (!link) return "";
+
+  try {
+    // Si déjà une URL absolue, on retourne directement
+    if (/^https?:\/\//i.test(link)) {
+      return link;
     }
+
+    // Nettoyage pour éviter les doublons /api/v1
+    const cleanedBase = baseUrl.replace(/\/api\/v1$/, "");
+
+    // Concaténation intelligente
+    return new URL(link.startsWith("/") ? link : `/${link}`, cleanedBase).href;
+  } catch (e) {
+    console.error("Erreur lors de la création de l'URL :", e);
+    return link;
+  }
 }

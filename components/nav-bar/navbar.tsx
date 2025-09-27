@@ -2,15 +2,15 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+// import {
+//   Select,
+//   SelectContent,
+//   SelectGroup,
+//   SelectItem,
+//   SelectLabel,
+//   SelectTrigger,
+//   SelectValue,
+// } from '@/components/ui/select';
 import {
   Menu,
   Search,
@@ -18,9 +18,10 @@ import {
   User,
   Sun,
   Moon,
-  Calendar
+  
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+// import GlobalNavbarFilter from './global-navbar-filter';
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -47,27 +48,10 @@ export default function Navbar({ toggleSidebar }: NavbarProps) {
             <Menu className="h-5 w-5" />
           </Button>
 
-          {/* Sélecteur de période avec icône */}
-          <div className="hidden md:flex items-center gap-2">
-            <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Select defaultValue="mois">
-                <SelectTrigger className="w-[400px] h-9 pl-9">
-                  <SelectValue placeholder="Sélectionnez une période" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Filtrer par période</SelectLabel>
-                    <SelectItem value="jour">Aujourd&apos;hui</SelectItem>
-                    <SelectItem value="semaine">Cette semaine</SelectItem>
-                    <SelectItem value="mois">Ce mois</SelectItem>
-                    <SelectItem value="trimestre">Ce trimestre</SelectItem>
-                    <SelectItem value="annee">Cette année</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          {/* Filtre global professionnel */}
+          {/* <div className="hidden lg:flex items-center gap-2">
+            <GlobalNavbarFilter />
+          </div> */}
         </div>
 
         {/* Partie droite */}

@@ -14,7 +14,7 @@ import { useQueryStates } from 'nuqs';
 import { depenseFiltersClient } from '../filters/depense.filter';
 import { useDepensesListQuery } from "../queries/depense-list.query";
 import { IDepense, IDepensesParams } from "../types/depense.type";
-import { fi } from "date-fns/locale";
+import { useGlobalFilterListener } from "@/hooks/use-global-filter-listener";
 
 export interface IDepenseListTableProps {
     columns: ColumnDef<IDepense>[];
@@ -29,6 +29,32 @@ export function useDepenseList({ columns, initialData = [] }: IDepenseListTableP
 
     // Gestion des paramètres d'URL via Nuqs
     const [filters, setFilters] = useQueryStates(depenseFiltersClient.filter, depenseFiltersClient.option);
+
+    // Écouter les filtres globaux de la navbar
+    useGlobalFilterListener({
+        moduleName: 'depense',
+        onFilterChange: (globalFilters) => {
+            // Appliquer les filtres globaux aux filtres locaux
+            setFilters(prev => ({
+                ...prev,
+                ...globalFilters,
+                page: 1, // Reset à la première page quand on filtre
+            }));
+        },
+        onFilterClear: () => {
+            // Réinitialiser tous les filtres
+            setFilters(prev => ({
+                ...prev,
+                description: '',
+                restaurantId: '',
+                dateDepense: '',
+                montant: 0,
+                categorie: '',
+                statut: '',
+                page: 1,
+            }));
+        }
+    });
 
     // Construction des paramètres de recherche
     const currentSearchParams: IDepensesParams = useMemo(() => {

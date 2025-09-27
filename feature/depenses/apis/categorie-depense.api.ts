@@ -16,7 +16,7 @@ export interface ICategorieDepenseAPI {
 export const categorieDepenseAPI: ICategorieDepenseAPI = {
     async create(dto: CategorieDepenseCreateDTO): Promise<ICategorieDepense> {
         return await api.request<ICategorieDepense>({
-            endpoint: `/categories`,
+            endpoint: `/finance/categories`,
             method: "POST",
             data: dto,
         });
@@ -24,7 +24,7 @@ export const categorieDepenseAPI: ICategorieDepenseAPI = {
 
     async obtenirToutesCategoriesDepenses(params: ICategorieDepenseParams): Promise<ICategorieDepense[]> {
         return await api.request<ICategorieDepense[]>({
-            endpoint: `/categories`,
+            endpoint: `/finance/categories`,
             method: "GET",
             searchParams: params as SearchParams,
         });
@@ -32,7 +32,7 @@ export const categorieDepenseAPI: ICategorieDepenseAPI = {
 
     async obtenirCategoriesActives(params: ICategorieDepenseParams): Promise<ICategorieDepense[]> {
         return await api.request<ICategorieDepense[]>({
-            endpoint: `/categories`,
+            endpoint: `/finance/categories`,
             method: "GET",
             searchParams: { ...params, isActive: true },
         });
@@ -40,29 +40,29 @@ export const categorieDepenseAPI: ICategorieDepenseAPI = {
 
     async getStats(): Promise<ICategorieDepenseStatsResponse> {
         return await api.request<ICategorieDepenseStatsResponse>({
-            endpoint: `/categories/stats`,
+            endpoint: `/finance/categories/stats`,
             method: "GET",
         });
     },
 
     async findOne(id: string): Promise<ICategorieDepense> {
         return await api.request<ICategorieDepense>({
-            endpoint: `/categories/${id}`,
+            endpoint: `/finance/categories/${id}`,
             method: "GET",
         });
     },
 
     async update(id: string, dto: CategorieDepenseUpdateDTO): Promise<ICategorieDepense> {
         return await api.request<ICategorieDepense>({
-            endpoint: `/categories/${id}`,
-            method: "PATCH",
+            endpoint: `/finance/categories/${id}`,
+            method: "PUT",
             data: dto,
         });
     },
 
     async remove(id: string): Promise<ICategorieDepense> {
         return await api.request<ICategorieDepense>({
-            endpoint: `/categories/${id}`,
+            endpoint: `/finance/categories/${id}`,
             method: "DELETE",
         });
     },

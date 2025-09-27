@@ -1,37 +1,22 @@
-export interface PaiementPartiel {
-    id: number;
+
+// investissements
+
+export interface IInvestissement {
+    id: string;
+    nomInvestisseur: string;
     montant: number;
-    date: Date;
-    preuvePaiement?: string;
+    dateInvestissement: string;
+    deadline: string;
 }
 
-
-export interface Facture {
-    id: number;
-    partenaire: string;
-    montant: number;
-    dateEcheance: Date;
-    statut: "En attente" | "Partiellement payé" | "Payé";
-    paiements: PaiementPartiel[];
-    montantPaye: number;
-}
-
-export interface Livraison {
-    id: number;
-    reference: string;
-    date: string;
-    nomLivreur: string;
-    coutLivraison: string;
-    coutCommande: string;
-    commission: string;
-}
-
-export interface Investissement {
-    id: number;
-    date_pret: string;
-    investisseur: string;
-    montant_pret: string;
-    echeance: string;
+export interface IInvestissementParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    dateInvestissement?: string;
+    deadline?: string;
+    nomInvestisseur?: string;
+    montant?: number;
 }
 
 export interface CommissionFixe {
@@ -42,11 +27,5 @@ export interface CommissionFixe {
     commission: string,
 }
 
-export interface CommissionVariable {
-    id: number,
-    date: string,
-    restaurant: string,
-    localisation: string,
-    montant_commande: string,
-    commission: string,
-}
+
+

@@ -7,7 +7,6 @@ import { LastDepense } from "@/feature/depenses/components/depense-list/last-dep
 import DepenseHeader from "@/components/depenses/header";
 import { useDepensesListQuery } from "@/feature/depenses/queries/depense-list.query";
 import { useCategorieDepensesListQuery } from "../queries/category/categorie-depense.query";
-import { IDepense } from "../types/depense.type";
 
 export default function DepenseClient() {
     const { data: depensesData, isLoading, error } = useDepensesListQuery({ page: 1, limit: 50 });

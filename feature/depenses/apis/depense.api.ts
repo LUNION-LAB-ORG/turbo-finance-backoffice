@@ -1,8 +1,7 @@
 import { DepenseCreateDTO, DepenseUpdateDTO } from "../schemas/depense.schema";
 import { SearchParams } from "ak-api-http";
 import { api } from "@/lib/api";
-import { IDepense, IDepensesParams, IDepenseStatsResponse } from "../types/depense.type";
-import { PaginatedResponse } from "@/types";
+import { IDepense, IDepensesParams } from "../types/depense.type";
 
 
 export interface IDepenseAPI {
@@ -17,7 +16,7 @@ export interface IDepenseAPI {
 export const depenseAPI: IDepenseAPI = {
     async obtenirTousDepenses(params: IDepensesParams): Promise<IDepense[]> {
         return await api.request<IDepense[]>({
-            endpoint: `/depenses`,
+            endpoint: `/finance/depenses`,
             method: "GET",
             searchParams: params as SearchParams,
         });
@@ -25,14 +24,14 @@ export const depenseAPI: IDepenseAPI = {
 
     async obtenirDepense(id: string): Promise<IDepense> {
         return await api.request<IDepense>({
-            endpoint: `/depenses/${id}`,
+            endpoint: `/finance/depenses/${id}`,
             method: "GET",
         });
     },
 
     ajouterDepense(data: DepenseCreateDTO): Promise<IDepense> {
         return api.request<IDepense>({
-            endpoint: `/depenses`,
+            endpoint: `/finance/depenses`,
             method: "POST",
             data,
         });
@@ -40,15 +39,15 @@ export const depenseAPI: IDepenseAPI = {
 
     modifierDepense(id: string, data: DepenseUpdateDTO): Promise<IDepense> {
         return api.request<IDepense>({
-            endpoint: `/depenses/${id}`,
-            method: "PATCH",
+            endpoint: `/finance/depenses/${id}`,
+            method: "PUT",
             data,
         });
     },
 
     supprimerDepense(id: string): Promise<IDepense> {
         return api.request<IDepense>({
-            endpoint: `/depenses/${id}`,
+            endpoint: `/finance/depenses/${id}`,
             method: "DELETE",
         });
 

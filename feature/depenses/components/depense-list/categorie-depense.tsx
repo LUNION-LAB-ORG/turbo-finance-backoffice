@@ -16,11 +16,11 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { CreerCategorieModal } from "./creer-categorie"
-import FilterCategorie from "../filtres/categorie/categorie.filters"
 import { ICategorieDepense } from "@/feature/depenses/types/categorie-depense.type"
 import { format, parseISO } from "date-fns"
 import { fr } from "date-fns/locale"
 import { CategorieDetailModal } from "./detail/categorie-detail"
+import { ModifierCategorieModal } from "../modifier/modifier-categorie-modal"
 
 interface CategorieDepenseProps {
     categorie_depenses: ICategorieDepense[]
@@ -76,7 +76,12 @@ export function CategorieDepenseList({ categorie_depenses }: CategorieDepensePro
                     <CardTitle>
                         <div className="flex justify-between items-center">
                             <p className="font-bold text-sm  md:text-2xl font-exo">Liste des catégories</p>
-                            
+                            <div
+                                className="flex justify-center items-center gap-2 font-normal text-sm"
+                            >
+                                {/* <FilterCategorie categorie_depenses={categorie_depenses}/> */}
+                                <CreerCategorieModal />
+                            </div>
                         </div>
                     </CardTitle>
                 </CardHeader>
@@ -116,6 +121,9 @@ export function CategorieDepenseList({ categorie_depenses }: CategorieDepensePro
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                                         <CategorieDetailModal categorie={categorie_depense} />
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                        <ModifierCategorieModal categorieDepense={categorie_depense} />
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>

@@ -10,6 +10,7 @@ import {
 import { MoreHorizontal } from "lucide-react"
 import { IDepense } from "@/feature/depenses/types/depense.type"
 import { DepenseDetailModal } from "./detail/depenses-detail"
+import { ModifierDepenseModal } from "../modifier/modifier-depenses-modal copy"
 
 interface DepensesTableProps {
   depenses: IDepense[]
@@ -60,6 +61,9 @@ export function DepensesTable({ depenses, getCategoriesStyle, formatDate, format
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
                         <DepenseDetailModal depense={depense} />
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
+                        <ModifierDepenseModal depenses={depense} />
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

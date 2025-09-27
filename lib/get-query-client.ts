@@ -6,8 +6,7 @@ const getQueryClient = cache(() => new QueryClient({
         queries: {
             staleTime: 60 * 1000, // 1 minute 
             gcTime: 5 * 60 * 1000, // 5 minutes (anciennement cacheTime)
-            retry: (failureCount, error: any) => {
-                if (error?.response?.status === 404) return false;
+            retry: (failureCount) => {
                 return failureCount < 3;
             },
             

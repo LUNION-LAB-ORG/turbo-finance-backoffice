@@ -1,18 +1,11 @@
-import RevenusHeader from "@/components/revenus/header";
-import FilterRestaurant from "@/feature/revenus/filtres/restaurant/filter-restaurant";
-import CommissionFixeAnalyse from "@/feature/revenus/cumul/commission-fixe/analyse";
-import CommissionFixe from "@/feature/revenus/cumul/commission-fixe/commission-list/commission-fixe";
-import Statistics from "@/feature/revenus/cumul/commission-fixe/statistics";
-
+import { prefetchCommissionFixeListQuery } from "@/feature/revenus/queries/commission/commissionfixe-list.query";
+import CommissionFixeClient from "@/feature/revenus/components/cumul/commission-fixe/commissison-fixe-client";
 export default function RevenueCommissionFixePage() {
+    prefetchCommissionFixeListQuery({
+        page: 1,
+        limit: 10,
+    })
     return (
-        <div>
-            <RevenusHeader title="Gestion des revenus sur les commission fixe"/>
-            <FilterRestaurant/>
-            <Statistics/>
-            <CommissionFixeAnalyse/>
-            <CommissionFixe/>
-           
-        </div>
+       <CommissionFixeClient/>
     );
 }

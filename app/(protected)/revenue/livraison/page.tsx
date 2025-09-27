@@ -1,17 +1,15 @@
-import RevenusHeader from "@/components/revenus/header";
-import LivraisonAnalyse from "@/feature/revenus/cumul/livraison/analyse";
-import Statistics from "@/feature/revenus/cumul/livraison/statistics";
-import FilterRestaurant from "@/feature/revenus/filtres/restaurant/filter-restaurant";
-import LivraisonList from "@/feature/revenus/cumul/livraison/livraison-list/livraison";
+
+import LivraisonClient from "@/feature/revenus/components/cumul/livraison/livraison-client";
+import { prefetchLivraisonListQuery } from "@/feature/revenus/queries/livraison/livraison-list.query";
 
 export default function RevenueLivraisonPage() {
+    prefetchLivraisonListQuery({
+        page: 1,
+        limit: 50,
+    })
     return (
         <div>
-            <RevenusHeader title="Gestion des revenus sur les livraisons"/>
-            <FilterRestaurant/>
-            <Statistics/>   
-            <LivraisonAnalyse/>
-            <LivraisonList/>
+            <LivraisonClient />
         </div>
     );
 }
