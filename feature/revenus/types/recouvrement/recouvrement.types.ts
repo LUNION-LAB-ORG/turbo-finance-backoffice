@@ -1,6 +1,4 @@
 // Dans recouvrement.types.ts
-import { IFacture } from "./prets.types";
-
 export interface IRecouvrement {
     id: string;
     montant: number;
@@ -37,6 +35,7 @@ export interface IRecouvrementParams {
     limit?: number;
     dateRecouvrement?: string;
     restaurantId?: string;
+    nomRestaurant?: string;
     montant?: number;
     search?: string;
 }

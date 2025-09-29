@@ -27,9 +27,7 @@ export function RecouvrementDetailModal({
     ? "0 FCFA"
     : `${recouvrement.montant.toLocaleString("fr-FR")} FCFA`;
 
-  const preuveUrl = recouvrement.preuve
-    ? getFullUrlFile(`/api/finance/recouvrements/${recouvrement.preuve}`)
-    : null;
+
 
   return (
     <Dialog>
@@ -136,10 +134,10 @@ export function RecouvrementDetailModal({
               Preuve
             </Label>
             <div className="col-span-3">
-              {preuveUrl ? (
+              {recouvrement.preuve ? (
                 <div className="flex items-center gap-3">
                   <Image
-                    src={preuveUrl}
+                    src={getFullUrlFile(recouvrement.preuve)}
                     alt="Preuve de recouvrement"
                     width={80}
                     height={60}
@@ -150,7 +148,7 @@ export function RecouvrementDetailModal({
                     size="sm"
                     onClick={() => {
                       const link = document.createElement("a");
-                      link.href = preuveUrl;
+                      link.href = getFullUrlFile(recouvrement.preuve);
                       link.download = recouvrement.preuve!;
                       link.click();
                     }}
@@ -197,12 +195,12 @@ export function RecouvrementDetailModal({
           >
             Imprimer
           </Button>
-          {preuveUrl && (
+          {recouvrement.preuve && (
             <Button
               type="button"
               onClick={() => {
                 const link = document.createElement("a");
-                link.href = preuveUrl;
+                link.href = getFullUrlFile(recouvrement.preuve);
                 link.download = `preuve-recouvrement-${recouvrement.id.slice(0, 8)}.jpg`;
                 link.click();
               }}

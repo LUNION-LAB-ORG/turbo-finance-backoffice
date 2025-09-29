@@ -1,149 +1,157 @@
+// RecouvrementList.tsx
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { Pagination } from "./pagination"
 import { Spinner } from "@heroui/spinner"
 import { useRecouvrementList } from "@/feature/revenus/hooks/use-recouvrement"
-import { PretTable } from "./recouvrement-list-table"
 import { CreerRecouvrementModal } from "./creer-recouvrement-modal"
+import { RecouvrementListTable } from "./recouvrement-list-table"
+import RestaurantFiltre from "./filtres/restaurant-filtre"
+import { Button } from "@/components/ui/button"
+import { Filter, X } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { DateFiltre } from "./filtres/date-filter"
+import { SearchFiltre } from "./filtres/search-filter"
 
 export function RecouvrementList() {
-    const [currentPage, setCurrentPage] = useState(1)
-    const [itemsPerPage, setItemsPerPage] = useState(10)
-    const [filters, setFilters] = useState({
-        id: "",
-        nomRestaurant: "",
-        dateRecouvrement: "",
-        montant: "",
-    })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(10)
+  
+  const { 
+    recouvrement, 
+    isLoading, 
+    isError, 
+    error, 
+    filters, 
+    handleFilterChange,
+    resetFilters 
+  } = useRecouvrementList()
 
-    //  On récupère les recouvrements depuis le hook
-    const { recouvrement, isLoading, isError, error } = useRecouvrementList()
+  // Compter le nombre de filtres actifs
+  const activeFiltersCount = Object.keys(filters).filter(key => 
+    key !== 'page' && key !== 'limit' && 
+    filters[key as keyof typeof filters] !== '' && 
+    filters[key as keyof typeof filters] !== 0
+  ).length
 
-    const handleFilterChange = (filterName: string, value: string) => {
-        setFilters((prev) => ({ ...prev, [filterName]: value }))
-        setCurrentPage(1)
+  // Pagination sur les données déjà filtrées par l'API
+  const totalPages = Math.ceil(recouvrement.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const currentRecouvrements = recouvrement.slice(startIndex, startIndex + itemsPerPage)
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return ""
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return dateString
+      return date.toLocaleDateString("fr-FR")
+    } catch {
+      return dateString
     }
+  }
 
-    //  Filtrage
-    const filteredRecouvrements = useMemo(() => {
-        if (!recouvrement || !Array.isArray(recouvrement)) return []
-        
-        return recouvrement.filter((recouvrementItem) => {
-            if (filters.id && recouvrementItem.id !== filters.id) return false
-            if (filters.nomRestaurant && recouvrementItem.nomRestaurant && !recouvrementItem.nomRestaurant.toLowerCase().includes(filters.nomRestaurant.toLowerCase())) return false
-            if (filters.dateRecouvrement && recouvrementItem.dateRecouvrement && !recouvrementItem.dateRecouvrement.includes(filters.dateRecouvrement)) return false
-            if (filters.montant) {
-                const montantValue = parseFloat(filters.montant)
-                if (isNaN(montantValue) || recouvrementItem.montant !== montantValue) return false
-            }
-            return true
-        })
-    }, [recouvrement, filters])
+  const formatMontant = (montant: number) =>
+    new Intl.NumberFormat("fr-FR").format(montant)
 
-    const totalPages = Math.ceil(filteredRecouvrements.length / itemsPerPage)
-    const startIndex = (currentPage - 1) * itemsPerPage
-    const currentRecouvrements = filteredRecouvrements.slice(startIndex, startIndex + itemsPerPage)
-
-    const formatDate = (dateString: string) => {
-        if (!dateString) return ""
-        try {
-            const date = new Date(dateString)
-            if (isNaN(date.getTime())) return dateString
-            return date.toLocaleDateString("fr-FR")
-        } catch {
-            return dateString
-        }
-    }
-
-    const formatMontant = (montant: number) =>
-        new Intl.NumberFormat("fr-FR").format(montant)
-
-    // const formatStatus = (statut: StatutPret) => {
-    //     switch (statut) {
-    //         case StatutPret.PAYEE:
-    //             return "Payée"
-    //         case StatutPret.PARTIEL:
-    //             return "Partiellement payée"
-    //         case StatutPret.EN_ATTENTE:
-    //             return "En attente"
-    //         default:
-    //             return "Inconnu"
-    //     }
-    // }
-
-    // const getCouleurStatut = (statut: StatutPret) => {
-    //     switch (statut) {
-    //         case StatutPret.PAYEE:
-    //             return "bg-green-100 text-green-800 hover:bg-green-100"
-    //         case StatutPret.PARTIEL:
-    //             return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-    //         case StatutPret.EN_ATTENTE:
-    //             return "bg-red-100 text-red-800 hover:bg-red-100"
-    //         default:
-    //             return "bg-gray-100 text-gray-800 hover:bg-gray-100"
-    //     }
-    // }
-
-    if (isLoading) {
-        return <Spinner color="danger" />
-    }
-
-    if (isError) {
-        return (
-            <div className="p-8 text-center text-red-500">
-                Erreur : {String(error)}
-            </div>
-        )
-    }
-
+  if (isLoading) {
     return (
-        <div className="w-full px-4 py-6">
-            <Card className="shadow-lg border-0">
-                <CardHeader className="bg-blue-50">
-                    <CardTitle>
-                        <div className="flex justify-between items-center gap-4 py-2">
-                            <h2 className="font-bold text-xl text-blue-800">Liste des recouvrements</h2>
-                            <CreerRecouvrementModal />
-                            {/* Ici tu peux remettre PretFilters si tu veux */}
-                        </div>
-                    </CardTitle>
-                </CardHeader>
-
-                <CardContent className="p-0">
-                    <PretTable
-                        recouvrement={currentRecouvrements}
-                        // getCouleurStatut={getCouleurStatut}
-                        formatMontant={formatMontant}
-                        formatDate={formatDate}
-                        // formatStatus={formatStatus}
-                    />
-
-                    <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        itemsPerPage={itemsPerPage}
-                        totalItems={filteredRecouvrements.length}
-                        onPageChange={setCurrentPage}
-                        onItemsPerPageChange={(val) => {
-                            setItemsPerPage(val)
-                            setCurrentPage(1)
-                        }}
-                    />
-
-                    {filteredRecouvrements.length === 0 && (
-                        <div className="p-8 text-center text-gray-500">
-                            <p>Aucun recouvrement trouvé</p>
-                            {Object.values(filters).some((f) => f) && (
-                                <p className="text-sm mt-2">
-                                    Essayez de modifier vos critères de recherche
-                                </p>
-                            )}
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-        </div>
+      <div className="flex justify-center items-center min-h-64">
+        <Spinner color="danger" />
+      </div>
     )
+  }
+
+  if (isError) {
+    return (
+      <div className="p-8 text-center text-red-500">
+        Erreur : {String(error)}
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full px-4 py-6 space-y-4">
+      {/* En-tête avec filtres */}
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div className="flex items-center gap-3">
+              <h2 className="font-bold text-xl text-blue-800">Liste des recouvrements</h2>
+              {activeFiltersCount > 0 && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Filter className="h-3 w-3" />
+                  {activeFiltersCount} filtre(s)
+                </Badge>
+              )}
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              <SearchFiltre />
+              <RestaurantFiltre onFilterChange={handleFilterChange} />
+              <DateFiltre />
+              {activeFiltersCount > 0 && (
+                <Button onClick={resetFilters} variant="outline" size="sm">
+                  <X className="h-4 w-4 mr-1" />
+                  Réinitialiser
+                </Button>
+              )}
+              <CreerRecouvrementModal />
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Tableau des recouvrements */}
+      <Card className="shadow-lg border-0">
+        <CardContent className="p-0">
+          <RecouvrementListTable
+            recouvrement={currentRecouvrements}
+            formatMontant={formatMontant}
+            formatDate={formatDate}
+            handleFilterChange={handleFilterChange}
+          />
+
+          {/* Pagination */}
+          {recouvrement.length > 0 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              itemsPerPage={itemsPerPage}
+              totalItems={recouvrement.length}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={(val) => {
+                setItemsPerPage(val)
+                setCurrentPage(1)
+              }}
+            />
+          )}
+
+          {/* Message vide */}
+          {recouvrement.length === 0 && (
+            <div className="p-8 text-center text-gray-500">
+              <p className="text-lg mb-2">Aucun recouvrement trouvé</p>
+              {activeFiltersCount > 0 ? (
+                <p className="text-sm">
+                  Essayez de modifier vos critères de recherche ou{' '}
+                  <Button 
+                    variant="link" 
+                    onClick={resetFilters}
+                    className="p-0 h-auto"
+                  >
+                    réinitialiser les filtres
+                  </Button>
+                </p>
+              ) : (
+                <p className="text-sm">
+                  Aucune donnée disponible pour le moment
+                </p>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
