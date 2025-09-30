@@ -18,6 +18,7 @@ import { Eye, Calendar, User, DollarSign, Hash, Building, Loader2, Download } fr
 import Image from "next/image";
 import { useRecouvrementsRestaurantQuery } from "@/feature/revenus/queries/recouvrement/recouvrement-restaurants-detail.qurey";
 import { toast } from "sonner";
+import { getFullUrlFile } from "@/utils/getFullUrlFile";
 
 interface PretDetailModalProps {
     facture: IFacture;
@@ -148,12 +149,13 @@ export function PretDetailModal({ facture }: PretDetailModalProps) {
                                         
                                         {recouv.preuve && (
                                             <div className="flex gap-2">
+                
                                                 <Button
                                                     variant="outline"
                                                     size="sm"
                                                     onClick={() => {
                                                         const link = document.createElement('a');
-                                                        link.href = `/api/proofs/${recouv.preuve}`;
+                                                        link.href = `${getFullUrlFile(recouv.preuve)}`;
                                                         link.download = recouv.preuve;
                                                         link.click();
                                                     }}
@@ -166,7 +168,7 @@ export function PretDetailModal({ facture }: PretDetailModalProps) {
                                                     size="sm"
                                                     onClick={() => {
                                                         // Ouvrir l'image dans un nouvel onglet pour aperçu
-                                                        window.open(`/api/proofs/${recouv.preuve}`, '_blank');
+                                                        window.open(`${getFullUrlFile(recouv.preuve)}`, '_blank');
                                                     }}
                                                 >
                                                     <Eye className="h-4 w-4 mr-1" />

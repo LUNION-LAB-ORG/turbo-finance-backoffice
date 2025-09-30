@@ -1,9 +1,6 @@
-"use client";
 
-// hooks/useInvestissementList.ts
-import { useMemo, useCallback } from "react";
-import { useQueryStates } from 'nuqs';
-import { investissementFiltersClient } from '../filters/investissement.filter';
+"use client"
+import { useMemo, useCallback, useState } from "react";
 import { IInvestissement, IInvestissementParams } from '../types/revenus.types';
 import { useInvestissementListQuery } from "../queries/investissement/investissement-list.query";
 
@@ -11,9 +8,27 @@ export interface IUseInvestissementListProps {
     initialData?: IInvestissement[];
 }
 
+export interface InvestissementFilters {
+    nomInvestisseur: string;
+    dateInvestissement: string;
+    deadline: string;
+    montant: number;
+    page: number;
+    limit: number;
+}
+
+const initialFilters: InvestissementFilters = {
+    nomInvestisseur: '',
+    dateInvestissement: '',
+    deadline: '',
+    montant: 0,
+    page: 1,
+    limit: 10,
+};
+
 export function useInvestissementList({ initialData = [] }: IUseInvestissementListProps = {}) {
-    // Gestion des paramètres d'URL via Nuqs
-    const [filters, setFilters] = useQueryStates(investissementFiltersClient.filter, investissementFiltersClient.option);
+    // Gestion des filtres avec useState
+    const [filters, setFilters] = useState<InvestissementFilters>(initialFilters);
 
     // Construction des paramètres de recherche
     const currentSearchParams: IInvestissementParams = useMemo(() => {
@@ -23,15 +38,15 @@ export function useInvestissementList({ initialData = [] }: IUseInvestissementLi
         };
         
         // Ajouter les paramètres de filtre seulement s'ils ne sont pas vides
-        if (filters.nomInvestisseur) {
+        if (filters.nomInvestisseur && filters.nomInvestisseur.trim() !== '') {
             params.nomInvestisseur = filters.nomInvestisseur;
         }
         
-        if (filters.dateInvestissement) {
+        if (filters.dateInvestissement && filters.dateInvestissement.trim() !== '') {
             params.dateInvestissement = filters.dateInvestissement;
         }
         
-        if (filters.deadline) {
+        if (filters.deadline && filters.deadline.trim() !== '') {
             params.deadline = filters.deadline;
         }
         
@@ -39,48 +54,49 @@ export function useInvestissementList({ initialData = [] }: IUseInvestissementLi
             params.montant = filters.montant;
         }
         
+        console.log('Params envoyés à la query:', params);
         return params;
     }, [filters]);
 
     // Récupération des données via la query
     const { data, isLoading, isError, error, isFetching } = useInvestissementListQuery(currentSearchParams);
 
-    const investissements = data || initialData;
+    // Fonction pour mettre à jour les filtres
+    const updateFilters = useCallback((newFilters: Partial<InvestissementFilters>) => {
+        setFilters(prev => ({ ...prev, ...newFilters }));
+    }, []);
 
     // Fonction pour gérer les changements de filtres
-    const handleFilterChange = useCallback((filterName: string, value: string | number) => {
-        setFilters(prev => ({
-            ...prev,
-            [filterName]: value,
-            page: 1, // Reset à la première page quand on filtre
-        }));
-    }, [setFilters]);
-
-    // Fonction pour gérer les changements de pagination
-    const handlePageChange = useCallback((page: number) => {
-        setFilters(prev => ({
-            ...prev,
-            page,
-        }));
-    }, [setFilters]);
-
-    // Fonction pour gérer les changements de limite
-    const handleLimitChange = useCallback((limit: number) => {
-        setFilters(prev => ({
-            ...prev,
-            limit,
-            page: 1, // Reset à la première page quand on change la limite
-        }));
-    }, [setFilters]);
+    const handleFilterChange = useCallback((filterName: keyof InvestissementFilters, value: string | number) => {
+        console.log('Changement de filtre:', filterName, value);
+        
+        // Vérifier le type attendu pour chaque propriété
+        let typedValue: string | number;
+        
+        if (filterName === 'page' || filterName === 'limit' || filterName === 'montant') {
+            // Convertir en nombre si nécessaire
+            typedValue = typeof value === 'string' ? Number(value) : value;
+        } else {
+            // Garder comme string pour les autres propriétés
+            typedValue = String(value);
+        }
+        
+        updateFilters({ 
+            [filterName]: typedValue,
+            page: filterName !== 'page' ? 1 : (typeof value === 'string' ? Number(value) : value),
+        });
+    }, [updateFilters]);
 
     return {
-        investissements,
+        investissements: data || initialData,
         isLoading: isLoading || isFetching,
         isError,
         error,
         filters,
         handleFilterChange,
-        handlePageChange,
-        handleLimitChange,
+        updateFilters,
+        handlePageChange: (page: number) => handleFilterChange('page', page),
+        handleLimitChange: (limit: number) => handleFilterChange('limit', limit),
+        resetFilters: () => setFilters(initialFilters),
     };
 }

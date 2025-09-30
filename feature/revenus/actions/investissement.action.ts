@@ -6,28 +6,55 @@ import { InvestissementCreateDTO, InvestissementUpdateDTO } from "../schemas/inv
 import { IInvestissement, IInvestissementParams } from "../types/revenus.types";
 import { investissementAPI } from "../apis/investissement.api";
 
-export const obtenirTousInvestissementsAction = async (params: IInvestissementParams): Promise<ActionResponse<IInvestissement[]>> => {
+// Action pour récupérer TOUS les investissements (sans filtrage)
+export const obtenirTousInvestissementsAction = async (params?: IInvestissementParams): Promise<ActionResponse<IInvestissement[]>> => {
     try {
-        const response = await investissementAPI.obtenirTousInvestissements(params);
+        console.log('🔍 Action: Récupération de tous les investissements', { params });
+        
+        // Si params est vide ou non défini, on récupère tout
+        // Si params contient des filtres, on les envoie à l'API (pour compatibilité)
+        const response = await investissementAPI.obtenirTousInvestissements(params || {});
+        
+        console.log('✅ Action: Données reçues', { count: response?.length });
+        
         return {
             success: true,
             data: response,
-            message: "Investissements obtenues avec succès",
+            message: "Investissements obtenus avec succès",
         }
     } catch (error) {
+        console.error('❌ Action: Erreur', error);
         return handleServerActionError(error, "Erreur lors de la récupération des investissements");
     }
 }
+
+// Action pour récupérer avec filtrage serveur (optionnel)
+export const obtenirInvestissementsFiltresAction = async (params: IInvestissementParams): Promise<ActionResponse<IInvestissement[]>> => {
+    try {
+        console.log('🔍 Action: Récupération avec filtres serveur', { params });
+        
+        const response = await investissementAPI.obtenirTousInvestissements(params);
+        
+        return {
+            success: true,
+            data: response,
+            message: "Investissements filtrés obtenus avec succès",
+        }
+    } catch (error) {
+        return handleServerActionError(error, "Erreur lors de la récupération des investissements filtrés");
+    }
+}
+
 export const obtenirInvestissementAction = async (id: string): Promise<ActionResponse<IInvestissement>> => {
     try {
         const response = await investissementAPI.obtenirInvestissement(id);
         return {
             success: true,
             data: response,
-            message: "Investissements obtenues avec succès",
+            message: "Investissement obtenu avec succès",
         }
     } catch (error) {
-        return handleServerActionError(error, "Erreur lors de la récupération des investissements");
+        return handleServerActionError(error, "Erreur lors de la récupération de l'investissement");
     }
 }
 
@@ -37,7 +64,7 @@ export const ajouterInvestissementAction = async (data: InvestissementCreateDTO)
         return {
             success: true,
             data: response,
-            message: "Investissement ajoutée avec succès",
+            message: "Investissement ajouté avec succès",
         }
     } catch (error) {
         return handleServerActionError(error, "Erreur lors de l'ajout de l'investissement");
@@ -50,7 +77,7 @@ export const modifierInvestissementAction = async (id: string, data: Investissem
         return {
             success: true,
             data: response,
-            message: "Investissement modifiée avec succès",
+            message: "Investissement modifié avec succès",
         }
     } catch (error) {
         return handleServerActionError(error, "Erreur lors de la modification de l'investissement");
@@ -63,9 +90,9 @@ export const supprimerInvestissementAction = async (id: string): Promise<ActionR
         return {
             success: true,
             data: data,
-            message: "Investissement supprimée avec succès",
+            message: "Investissement supprimé avec succès",
         }
     } catch (error) {
-        return handleServerActionError(error, "Erreur lors de la suppression de la dépense");
+        return handleServerActionError(error, "Erreur lors de la suppression de l'investissement");
     }
 }

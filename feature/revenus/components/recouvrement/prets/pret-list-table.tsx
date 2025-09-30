@@ -40,7 +40,7 @@ export function PretTable({ facture, formatMontant }: IPretTableProps) {
                             const montantRecouvre = facture.recouvrement?.reduce(
                                 (total, rec) => total + (Number(rec.montant) || 0),
                                 0
-                              ) || 0
+                            ) || 0
 
                             return (
                                 <TableRow key={facture.id} className="transition-colors hover:bg-gray-50">
@@ -59,9 +59,19 @@ export function PretTable({ facture, formatMontant }: IPretTableProps) {
                                     <TableCell className="text-center font-semibold text-red-600">
                                         {formatMontant(facture.totalFraisLivraisons + facture.totalCommission)} FCFA
                                     </TableCell>
-
                                     <TableCell className="text-center">
-                                        <PretDetailModal facture={facture} />
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button size="sm" variant="outline">
+                                                    <MoreHorizontal className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                    <PretDetailModal facture={facture} />
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
                                     </TableCell>
                                 </TableRow>
                             )

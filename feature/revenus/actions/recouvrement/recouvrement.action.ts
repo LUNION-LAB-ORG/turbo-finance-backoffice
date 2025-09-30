@@ -58,7 +58,6 @@ export async function ajouterRecouvrementAction(
                 console.log(`${key}:`, value);
             }
         }
-        console.log("==========================================");
 
         const createdRecouvrement = await recouvrementAPI.ajouterRecouvrement(formData);
 
@@ -68,7 +67,6 @@ export async function ajouterRecouvrementAction(
             message: "Recouvrement ajouté avec succès.",
         };
     } catch (error) {
-        console.error("Erreur détaillée lors de la création du recouvrement:", error);
         return handleServerActionError(error, "Erreur lors de la création du recouvrement.");
     }
 }
@@ -126,6 +124,8 @@ export async function obtenirRecouvrementDetailAction(id: string): Promise<Actio
 
 export async function obtenirTousRecouvrementsAction(params: IRecouvrementParams):
     Promise<ActionResponse<PaginatedResponse<IRecouvrement>>> {
+
+        console.log("params", params);
     try {
         const getAllRecouvrements = await recouvrementAPI.obtenirTousRecouvrements(params);
         return {

@@ -1,9 +1,8 @@
 "use client";
 
 // hooks/useInvestissementList.ts
-import { useMemo, useCallback } from "react";
-import { useQueryStates } from 'nuqs';
-import { pretFiltersClient } from '../filters/pret.filter';
+import { useState, useMemo, useCallback } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { IFacture, IFactureParams } from '../types/recouvrement/prets.types';
 import { usePretListQuery } from "../queries/prets/pret-list.query";
 import { useGlobalFilterListener } from "@/hooks/use-global-filter-listener";
@@ -13,8 +12,20 @@ export interface IUsePretListProps {
 }
 
 export function usePretList({ initialData = [] }: IUsePretListProps = {}) {
-    // Gestion des paramètres d'URL via Nuqs
-    const [filters, setFilters] = useQueryStates(pretFiltersClient.filter, pretFiltersClient.option);
+    // État local pour les filtres (sans Nuqs)
+    const [filters, setFilters] = useState({
+        page: 1,
+        limit: 10,
+        search: '',
+        nomRestaurant: '',
+    });
+
+    // Construction des paramètres de recherche pour l'API (sans filtre de restaurant)
+    const apiParams: IFactureParams = {
+        page: 1,
+        limit: 1000, // Obtenir toutes les données pour le filtrage côté client
+        search: filters.search || undefined,
+    };
 
     // Écouter les filtres globaux de la navbar
     useGlobalFilterListener({
@@ -32,34 +43,31 @@ export function usePretList({ initialData = [] }: IUsePretListProps = {}) {
             setFilters(prev => ({
                 ...prev,
                 search: '',
-                restaurantId: '',
-                dateRecouvrement: '',
-                montant: 0,
-                statut: '',
+                nomRestaurant: '',
                 page: 1,
             }));
         }
     });
 
-    // Construction des paramètres de recherche
-    const currentSearchParams: IFactureParams = useMemo(() => {
-        const params: IFactureParams = {
-            page: filters.page,
-            limit: filters.limit,
-        };
+    // Utiliser React Query pour récupérer TOUTES les données
+    const { data: queryData, isLoading, isError, error, isFetching } = usePretListQuery(apiParams);
+
+    // Toutes les données (non filtrées)
+    const allFactures: IFacture[] = queryData || initialData;
+
+    // Filtrage côté client
+    const facture = useMemo(() => {
+        let filtered = allFactures;
         
-        // Ajouter le search seulement s'il n'est pas vide
-        if (filters.search) {
-            params.search = filters.search;
+        // Filtrer par restaurant
+        if (filters.nomRestaurant) {
+            filtered = filtered.filter((facture: IFacture) => 
+                facture.nomRestaurant?.toLowerCase().includes(filters.nomRestaurant.toLowerCase())
+            );
         }
         
-        return params;
-    }, [filters]);
-
-    // Récupération des données via la query
-    const { data, isLoading, isError, error, isFetching } = usePretListQuery(currentSearchParams);
-
-    const facture = data || initialData;
+        return filtered;
+    }, [allFactures, filters]);
 
     // Fonction pour gérer les changements de filtres
     const handleFilterChange = useCallback((filterName: string, value: string | number) => {
@@ -68,33 +76,38 @@ export function usePretList({ initialData = [] }: IUsePretListProps = {}) {
             [filterName]: value,
             page: 1, // Reset à la première page quand on filtre
         }));
-    }, [setFilters]);
+    }, []);
 
-    // Fonction pour gérer les changements de pagination
-    const handlePageChange = useCallback((page: number) => {
+    // Fonction pour réinitialiser tous les filtres
+    const resetFilters = useCallback(() => {
+        setFilters({
+            page: 1,
+            limit: 10,
+            search: '',
+            nomRestaurant: '',
+        });
+    }, []);
+
+    // Fonction pour réinitialiser un filtre spécifique
+    const resetFilter = useCallback((filterName: string) => {
         setFilters(prev => ({
             ...prev,
-            page,
+            [filterName]: filterName === 'limit' ? 10 : '',
+            page: 1,
         }));
-    }, [setFilters]);
-
-    // Fonction pour gérer les changements de limite
-    const handleLimitChange = useCallback((limit: number) => {
-        setFilters(prev => ({
-            ...prev,
-            limit,
-            page: 1, // Reset à la première page quand on change la limite
-        }));
-    }, [setFilters]);
+    }, []);
 
     return {
         facture,
-        isLoading: isLoading || isFetching,
+        allFactures,
+        isLoading,
         isError,
         error,
+        isFetching,
         filters,
         handleFilterChange,
-        handlePageChange,
-        handleLimitChange,
+        resetFilters,
+        resetFilter,
+        setFilters,
     };
 }

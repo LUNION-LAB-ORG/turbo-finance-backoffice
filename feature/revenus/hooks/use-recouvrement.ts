@@ -1,70 +1,52 @@
-"use client";
-
-// hooks/useInvestissementList.ts
-import { useMemo, useCallback } from "react";
-import { useQueryStates } from 'nuqs';
-import { recouvrementFiltersClient } from '../filters/recouvrement.filter';
+"use client"
+import { useState, useMemo, useCallback } from "react";
+import { useQuery } from '@tanstack/react-query';
 import { IRecouvrement, IRecouvrementParams } from '../types/recouvrement/recouvrement.types';
-import { useRecouvrementListQuery } from "../queries/recouvrement/recouvrement-list.query";
-import { useGlobalFilterListener } from "@/hooks/use-global-filter-listener";
+import { recouvrementListQueryOption } from '../queries/recouvrement/recouvrement-list.query';
 
 export interface IUseRecouvrementProps {
     initialData?: IRecouvrement[];
 }
 
 export function useRecouvrementList({ initialData = [] }: IUseRecouvrementProps = {}) {
-    // Gestion des paramètres d'URL via Nuqs
-    const [filters, setFilters] = useQueryStates(recouvrementFiltersClient.filter, recouvrementFiltersClient.option);
-
-    // Écouter les filtres globaux de la navbar
-    useGlobalFilterListener({
-        moduleName: 'recouvrement',
-        onFilterChange: (globalFilters) => {
-            // Appliquer les filtres globaux aux filtres locaux
-            setFilters(prev => ({
-                ...prev,
-                ...globalFilters,
-                page: 1, // Reset à la première page quand on filtre
-            }));
-        },
-        onFilterClear: () => {
-            // Réinitialiser tous les filtres
-            setFilters(prev => ({
-                ...prev,
-                search: '',
-                restaurantId: '',
-                dateRecouvrement: '',
-                montant: 0,
-                statut: '',
-                page: 1,
-            }));
-        }
+    // État local pour les filtres
+    const [filters, setFilters] = useState({
+        page: 1,
+        limit: 10,
+        search: '',
+        nomRestaurant: '',
+        dateRecouvrement: '',
+        montant: 0,
     });
 
-    // Construction des paramètres de recherche
-    const currentSearchParams: IRecouvrementParams = useMemo(() => {
-        const params: IRecouvrementParams = {
-            page: filters.page,
-            limit: filters.limit,
-            search: filters.search,
-            factureId: filters.factureId,
-            dateRecouvrement: filters.dateRecouvrement,
-            restaurantId: filters.restaurantId,
-            montant: filters.montant,
-        };
+    // Construction des paramètres de recherche pour l'API (sans filtre de restaurant)
+    const apiParams: IRecouvrementParams = {
+        page: 1,
+        limit: 1000, // Obtenir toutes les données pour le filtrage côté client
+        search: filters.search || undefined,
+        dateRecouvrement: filters.dateRecouvrement || undefined,
+        montant: filters.montant > 0 ? filters.montant : undefined,
+    };
+
+    // Utiliser React Query pour récupérer TOUTES les données
+    const { data: queryData, isLoading, isError, error, isFetching } = useQuery(recouvrementListQueryOption(apiParams));
+
+    // Toutes les données (non filtrées) - garantir que c'est un tableau
+    const allRecouvrements: IRecouvrement[] = Array.isArray(queryData) ? queryData : (queryData?.data || initialData);
+
+    // Filtrage côté client
+    const recouvrement = useMemo(() => {
+        let filtered = allRecouvrements;
         
-        // Ajouter le search seulement s'il n'est pas vide
-        if (filters.search) {
-            params.search = filters.search;
+        // Filtrer par restaurant
+        if (filters.nomRestaurant) {
+            filtered = filtered.filter((rec: IRecouvrement) => 
+                rec.nomRestaurant?.toLowerCase().includes(filters.nomRestaurant.toLowerCase())
+            );
         }
         
-        return params;
-    }, [filters]);
-
-    // Récupération des données via la query
-    const { data, isLoading, isError, error, isFetching } = useRecouvrementListQuery(currentSearchParams);
-
-    const recouvrement = data || initialData;
+        return filtered;
+    }, [allRecouvrements, filters]);
 
     // Fonction pour gérer les changements de filtres
     const handleFilterChange = useCallback((filterName: string, value: string | number) => {
@@ -73,33 +55,40 @@ export function useRecouvrementList({ initialData = [] }: IUseRecouvrementProps 
             [filterName]: value,
             page: 1, // Reset à la première page quand on filtre
         }));
-    }, [setFilters]);
+    }, []);
 
-    // Fonction pour gérer les changements de pagination
-    const handlePageChange = useCallback((page: number) => {
+    // Fonction pour réinitialiser tous les filtres
+    const resetFilters = useCallback(() => {
+        setFilters({
+            page: 1,
+            limit: 10,
+            search: '',
+            nomRestaurant: '',
+            dateRecouvrement: '',
+            montant: 0,
+        });
+    }, []);
+
+    // Fonction pour réinitialiser un filtre spécifique
+    const resetFilter = useCallback((filterName: string) => {
         setFilters(prev => ({
             ...prev,
-            page,
+            [filterName]: filterName === 'montant' ? 0 : '',
+            page: 1,
         }));
-    }, [setFilters]);
-
-    // Fonction pour gérer les changements de limite
-    const handleLimitChange = useCallback((limit: number) => {
-        setFilters(prev => ({
-            ...prev,
-            limit,
-            page: 1, // Reset à la première page quand on change la limite
-        }));
-    }, [setFilters]);
+    }, []);
 
     return {
         recouvrement,
-        isLoading: isLoading || isFetching,
+        allRecouvrements,
+        isLoading,
         isError,
         error,
+        isFetching,
         filters,
         handleFilterChange,
-        handlePageChange,
-        handleLimitChange,
+        resetFilters,
+        resetFilter,
+        setFilters,
     };
 }

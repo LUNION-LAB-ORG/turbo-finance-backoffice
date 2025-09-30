@@ -15,7 +15,7 @@ export default function CommissionFixeClient() {
             <RevenusHeader title="Gestion des revenus sur les commission fixe" />
             {/* <FilterRestaurant/> */}
             <Statistics commissionFixe={commissionsfixe} />
-            <CommissionFixeAnalyse commissionFixe={commissionsfixe} />
+            <CommissionFixeAnalyse />
             <CommissionFixe />
 
         </div>
