@@ -1,5 +1,4 @@
-import { baseURL } from "@/config";
-
+import { uploadUrl } from "@/config";
 /**
  * Construit une URL absolue pour un fichier (ex: image).
  *
@@ -10,7 +9,11 @@ import { baseURL } from "@/config";
  * @param {string} baseUrl URL de base (par défaut ton backend).
  * @returns {string} URL absolue prête à l'emploi.
  */
-export function getFullUrlFile(link: string, baseUrl: string = baseURL) {
+
+
+
+
+export function getFullUrlFile(link: string, baseUrl: string = uploadUrl) {
   if (!link) return "";
 
   try {
@@ -23,7 +26,7 @@ export function getFullUrlFile(link: string, baseUrl: string = baseURL) {
     const cleanedBase = baseUrl.replace(/\/api\/v1$/, "").replace(/\/$/, "");
 
     // Ajout du chemin /api/upload/
-    return `${cleanedBase}/upload/${link}`;
+    return `${cleanedBase}/${link}`;
   } catch (e) {
     console.error("Erreur lors de la création de l'URL :", e);
     return link;

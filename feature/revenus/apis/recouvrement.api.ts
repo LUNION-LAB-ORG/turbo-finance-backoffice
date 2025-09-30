@@ -7,6 +7,7 @@ export interface IRecouvrementAPI {
     obtenirTousRecouvrements: (params: IRecouvrementParams) => Promise<PaginatedResponse<IRecouvrement>>;
     obtenirRecouvrement: (id: string) => Promise<IRecouvrement>;
     obtenirRecouvrementsRestaurant: (restaurantId: string) => Promise<IRecouvrement[]>;
+    obtenirTousRestaurants: () => Promise<string[]>;
     ajouterRecouvrement: (data: FormData) => Promise<IRecouvrement>;
     modifierRecouvrement: (id: string, formData: FormData) => Promise<IRecouvrement>;
     supprimerRecouvrement: (id: string) => Promise<IRecouvrement>;
@@ -33,6 +34,13 @@ export const recouvrementAPI: IRecouvrementAPI = {
     async obtenirRecouvrementsRestaurant(restaurantId: string): Promise<IRecouvrement[]> {
         return await api.request<IRecouvrement[]>({
           endpoint: `/finance/recouvrements/${restaurantId}/restaurant`,
+          method: "GET",
+        });
+    },
+
+    async obtenirTousRestaurants(): Promise<string[]> {
+        return await api.request<string[]>({
+          endpoint: `/finance/recouvrements/restaurants`,
           method: "GET",
         });
     },

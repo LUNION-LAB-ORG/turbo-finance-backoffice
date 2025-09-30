@@ -1,4 +1,5 @@
 "use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Table,
@@ -16,47 +17,56 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import FilterPeriode from "@/feature/revenus/components/filtres/periode/filter-periode"
 import { AddInvestModal } from "../creer-invest/add-invest-modal"
 import { InvestDetailModal } from "./invest-detail-modal"
-import { IInvestissement } from "@/feature/revenus/types/revenus.types"
 import { format, parseISO } from "date-fns"
 import { fr } from "date-fns/locale"
 import { ModifierInvestModal } from "../modifier/modifier-invest-modal"
 import InvestisseurNameFilter from "../filtres/filtre-nom-investisseur"
 import InvestissementDateFilter from "../filtres/filtres-par-date"
+import { useInvestissementList } from "@/feature/revenus/hooks/use-investissement-list";
 
-interface InvestissementProps {
-    investissements?: IInvestissement[];
-}
+export default function InvestissementList() {
+    const { investissements, isLoading, isError, error } = useInvestissementList();
 
-export default function InvestissementList({ investissements = [] }: InvestissementProps) {
+    const formatDate = (dateString: string) => {
+        if (!dateString) return "";
 
-    // fonction pour formater la createdAt
-        const formatDate = (dateString: string) => {
-            if (!dateString) return "";
-    
-            try {
-                const date = parseISO(dateString);
-                return format(date, "dd/MM/yyyy HH:mm", { locale: fr });
-            } catch (error) {
-                console.warn("Erreur de formatage de date:", error);
-                return dateString;
-            }
-        };
-    
-        // Formatage de la date pour mobile
-        const formatDateForMobile = (dateString: string) => {
-            if (!dateString) return "";
-    
-            try {
-                const date = parseISO(dateString);
-                return format(date, "dd/MM/yy", { locale: fr });
-            } catch (error) {
-                return dateString.split('T')[0]; // Juste la partie date avant le T
-            }
+        try {
+            const date = parseISO(dateString);
+            return format(date, "dd/MM/yyyy HH:mm", { locale: fr });
+        } catch (error) {
+            console.warn("Erreur de formatage de date:", error);
+            return dateString;
         }
+    };
 
+    const formatDateForMobile = (dateString: string) => {
+        if (!dateString) return "";
+
+        try {
+            const date = parseISO(dateString);
+            return format(date, "dd/MM/yy", { locale: fr });
+        } catch (error) {
+            return dateString.split('T')[0];
+        }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center p-8">
+                <p>Chargement des investissements...</p>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="flex justify-center items-center p-8">
+                <p className="text-red-500">Erreur lors du chargement des investissements</p>
+            </div>
+        );
+    }
 
     return (
         <div className="">
@@ -65,16 +75,12 @@ export default function InvestissementList({ investissements = [] }: Investissem
                     <CardTitle>
                         <div className="flex justify-between items-center">
                             <p className="font-bold text-sm md:text-xl lg:text-2xl">Liste des investissements</p>
-                            <div
-                                className="grid grid-cols-1 md:grid-cols-2 gap-2  font-normal font-exo text-sm"
-                            >
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 font-normal font-exo text-sm">
                                 <InvestissementDateFilter />
                                 <InvestisseurNameFilter />
                                 <AddInvestModal />
-                               
                             </div>
                         </div>
-                     
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -83,11 +89,11 @@ export default function InvestissementList({ investissements = [] }: Investissem
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-red-500 hover:bg-red-600">
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Date</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Investisseur</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Montant du pret</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Echéance</TableHead>
-                                    <TableHead className="font-semibold text-white text-center hover:text-white">Actions</TableHead>
+                                    <TableHead className="font-semibold text-white text-center">Date</TableHead>
+                                    <TableHead className="font-semibold text-white text-center">Investisseur</TableHead>
+                                    <TableHead className="font-semibold text-white text-center">Montant du pret</TableHead>
+                                    <TableHead className="font-semibold text-white text-center">Echéance</TableHead>
+                                    <TableHead className="font-semibold text-white text-center">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -97,7 +103,7 @@ export default function InvestissementList({ investissements = [] }: Investissem
                                             {formatDate(investissement.dateInvestissement)}
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <span className={`font-semibold rounded-full px-2 py-1 text-center`}>
+                                            <span className="font-semibold rounded-full px-2 py-1 text-center">
                                                 {investissement.nomInvestisseur}
                                             </span>
                                         </TableCell>
@@ -110,7 +116,7 @@ export default function InvestissementList({ investissements = [] }: Investissem
                                         <TableCell className="text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button className="bg-red-400 hover:bg-red-600 cursor-pointer ">
+                                                    <Button className="bg-red-400 hover:bg-red-600 cursor-pointer">
                                                         <MoreHorizontal className="h-4 w-4 cursor-pointer" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -132,14 +138,14 @@ export default function InvestissementList({ investissements = [] }: Investissem
 
                     {/* Version Mobile */}
                     <div className="md:hidden space-y-4 p-4">
-                    {investissements?.map((investissement) => (
+                        {investissements?.map((investissement) => (
                             <div key={investissement.id} className="bg-white border rounded-lg p-4 shadow-sm">
                                 <div className="flex justify-between items-start mb-3">
                                     <p className="text-sm text-gray-500">
                                         {formatDateForMobile(investissement.dateInvestissement)}
                                     </p>
-                                    <h3 className={`font-semibold rounded-md px-2 text-sm  `}>
-                                        {'investissement.nomInvestisseur'}
+                                    <h3 className="font-semibold rounded-md px-2 text-sm">
+                                        {investissement.nomInvestisseur}
                                     </h3>
                                 </div>
 
@@ -150,7 +156,7 @@ export default function InvestissementList({ investissements = [] }: Investissem
                                     </div>
                                     <div>
                                         <span className="text-gray-600">Echéance :</span>
-                                        <span className="text-black ml-2">{investissement.deadline}</span>
+                                        <span className="text-black ml-2">{formatDateForMobile(investissement.deadline)}</span>
                                     </div>
                                     <div className="text-right">
                                         <Button variant="default" size="sm">
@@ -160,24 +166,8 @@ export default function InvestissementList({ investissements = [] }: Investissem
                                 </div>
                             </div>
                         ))}
-
                     </div>
 
-                    {/* Pagination
-                    <div className="flex justify-between items-center p-4 border-t">
-                        <p className="text-sm text-gray-600">
-                            Affichage de 1 à {investissements.length} sur {investissements.length} commissions(fixe)
-                        </p>
-                        <div className="flex gap-2">
-                            <Button variant="outline" size="sm" disabled>
-                                Précédent
-                            </Button>
-                            <Button variant="outline" size="sm">
-                                Suivant
-                            </Button>
-                        </div>
-                    </div> */}
-                    
                     {/* Message si aucun investissement */}
                     {!investissements || investissements.length === 0 && (
                         <div className="p-8 text-center text-gray-500">

@@ -6,6 +6,7 @@ import { PretTable } from "./pret-list-table"
 import { Pagination } from "./pagination"
 import { usePretList } from "@/feature/revenus/hooks/use-pret-list"
 import { Spinner } from "@heroui/spinner"
+import RestaurantFiltre from "./restaurant-filtre"
 
 export function PretList() {
     const [currentPage, setCurrentPage] = useState(1)
@@ -76,7 +77,7 @@ export function PretList() {
                     <CardTitle>
                         <div className="flex justify-between items-center gap-4 py-2">
                             <h2 className="font-bold text-xl text-blue-800">Liste des factures a recouvrir</h2>
-                            {/* <CreerPretModal /> */}
+                            <RestaurantFiltre onFilterChange={handleFilterChange}/>
                         </div>
                     </CardTitle>
                 </CardHeader>

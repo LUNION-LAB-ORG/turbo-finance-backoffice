@@ -1,4 +1,3 @@
-// components/filtres/restaurant-filtre.tsx
 "use client"
 import {
   Select,
@@ -7,28 +6,28 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { usePretList } from "@/feature/revenus/hooks/use-pret-list";
 import { useMemo } from "react"
-import { useRecouvrementList } from "@/feature/revenus/hooks/use-recouvrement";
 
 interface RestaurantFiltreProps {
   onFilterChange?: (filterName: string, value: string) => void;
 }
 
 export default function RestaurantFiltre({ onFilterChange }: RestaurantFiltreProps) {
-  const { allRecouvrements, filters, handleFilterChange } = useRecouvrementList();
+  const { allFactures, filters, handleFilterChange } = usePretList();
 
   // Extraire les noms de restaurants uniques à partir de TOUTES les données
   const restaurants = useMemo(() => {
-    if (!allRecouvrements || allRecouvrements.length === 0) {
+    if (!allFactures || allFactures.length === 0) {
       return [];
     }
     
     const uniqueRestaurants = Array.from(
-      new Set(allRecouvrements.map(rec => rec.nomRestaurant).filter(Boolean))
+      new Set(allFactures.map(rec => rec.nomRestaurant).filter(Boolean))
     ).sort();
     
     return uniqueRestaurants;
-  }, [allRecouvrements]);
+  }, [allFactures]);
 
   // Gérer le changement de restaurant
   const handleRestaurantChange = (value: string) => {

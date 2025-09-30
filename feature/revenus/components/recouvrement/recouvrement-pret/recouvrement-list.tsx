@@ -12,7 +12,6 @@ import RestaurantFiltre from "./filtres/restaurant-filtre"
 import { Button } from "@/components/ui/button"
 import { Filter, X } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { DateFiltre } from "./filtres/date-filter"
 import { SearchFiltre } from "./filtres/search-filter"
 
 export function RecouvrementList() {
@@ -87,16 +86,16 @@ export function RecouvrementList() {
               )}
             </div>
             
-            <div className="flex flex-wrap gap-2">
-              <SearchFiltre />
+            <div className="flex items-center gap-2">
+              {/* <SearchFiltre /> */}
               <RestaurantFiltre onFilterChange={handleFilterChange} />
-              <DateFiltre />
+              {/* <DateFiltre />
               {activeFiltersCount > 0 && (
                 <Button onClick={resetFilters} variant="outline" size="sm">
                   <X className="h-4 w-4 mr-1" />
                   Réinitialiser
                 </Button>
-              )}
+              )} */}
               <CreerRecouvrementModal />
             </div>
           </div>
