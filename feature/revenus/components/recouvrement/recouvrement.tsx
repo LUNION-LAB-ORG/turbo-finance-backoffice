@@ -1,5 +1,5 @@
 "use client"
-import { useMemo, useEffect } from "react"
+import { useMemo } from "react"
 
 import DetailRecouvrement from "./detail"
 import { RepartionPieDonutRecouvrement } from "./repartition"
@@ -14,7 +14,7 @@ export default function Recouvrement() {
     const recouvrements = useMemo(() => {
         if (!recouvrementsData) return [];
         if (Array.isArray(recouvrementsData)) return recouvrementsData;
-        return recouvrementsData.data || [];
+        return recouvrementsData || [];
     }, [recouvrementsData]);
     
     // Gérer les données paginées pour les factures

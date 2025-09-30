@@ -124,8 +124,6 @@ export async function obtenirRecouvrementDetailAction(id: string): Promise<Actio
 
 export async function obtenirTousRecouvrementsAction(params: IRecouvrementParams):
     Promise<ActionResponse<PaginatedResponse<IRecouvrement>>> {
-
-        console.log("params", params);
     try {
         const getAllRecouvrements = await recouvrementAPI.obtenirTousRecouvrements(params);
         return {
