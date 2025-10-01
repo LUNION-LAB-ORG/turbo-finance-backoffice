@@ -24,7 +24,7 @@ export function DepenseDetailModal({ depense }: DepenseDetailModalProps) {
         <Dialog>
             <DialogTrigger asChild>
                 <button className="flex items-center gap-2 cursor-pointer hover:text-blue-800 transition-colors">
-                    <Eye className="h-5 w-5 text-red-500" />
+                    <Eye className="h-5 w-5 text-blue-500" />
                     <span className="hidden md:flex text-sm font-medium">Voir détails</span>
                 </button>
             </DialogTrigger>

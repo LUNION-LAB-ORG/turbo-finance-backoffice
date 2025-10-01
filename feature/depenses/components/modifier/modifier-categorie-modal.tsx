@@ -1,5 +1,4 @@
 "use client"
-import { CalendarInput } from "@/components/block/dateInput"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -13,15 +12,11 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState, useEffect } from "react"
+import { useState,  } from "react"
 import { Edit } from "lucide-react"
 import { toast } from "sonner"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { IDepense } from "../../types/depense.type"
-import { DepenseUpdateDTO, DepenseUpdateSchema } from "../../schemas/depense.schema"
-import { useModifierDepenseMutation } from "../../queries/depense.mutation"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ICategorieDepense } from "../../types/categorie-depense.type"
 import { CategorieDepenseUpdateDTO, CategorieDepenseUpdateSchema } from "../../schemas/categorie-depense.schema"
 import { useModifierCategorieDepenseMutation } from "../../queries/category/categorie-depense-mutation.query"
@@ -40,8 +35,6 @@ export function ModifierCategorieModal({ categorieDepense }: ModdifierDepenseMod
         handleSubmit,
         formState: { errors, isSubmitting },
         reset,
-        setValue,
-        watch,
     } = useForm<CategorieDepenseUpdateDTO>({
         resolver: zodResolver(CategorieDepenseUpdateSchema),
         defaultValues: {
@@ -88,7 +81,7 @@ export function ModifierCategorieModal({ categorieDepense }: ModdifierDepenseMod
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog>
             <DialogTrigger asChild>
                 <button className="flex items-center gap-2 cursor-pointer hover:text-blue-800 transition-colors">
                     <Edit className="h-5 w-5 text-amber-500" />

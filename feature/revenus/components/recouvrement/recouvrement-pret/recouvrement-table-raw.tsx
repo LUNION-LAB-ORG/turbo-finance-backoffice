@@ -8,6 +8,7 @@ import { RecouvrementDetailModal } from "./recouvrement-detail-modal"
 import { IRecouvrement } from "@/feature/revenus/types/recouvrement/recouvrement.types"
 import { getFullUrlFile } from "@/utils/getFullUrlFile"
 import Image from "next/image"
+import SupprimerRecouvrementModal from "./suppression/supprimer-recouvrement-modal"
 
 interface IRowProps {
   recouv: IRecouvrement
@@ -107,6 +108,9 @@ export function RecouvrementTableRow({
                 <Download className="h-4 w-4 mr-2" /> Télécharger preuve
               </DropdownMenuItem>
             )}
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+              <SupprimerRecouvrementModal recouvrement={recouv} />
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

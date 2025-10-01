@@ -25,6 +25,7 @@ import { ModifierInvestModal } from "../modifier/modifier-invest-modal"
 import InvestisseurNameFilter from "../filtres/filtre-nom-investisseur"
 import InvestissementDateFilter from "../filtres/filtres-par-date"
 import { useInvestissementList } from "@/feature/revenus/hooks/use-investissement-list";
+import SupprimerInvestModal from "../supprimer/supprimer-invest-modal"
 
 export default function InvestissementList() {
     const { investissements, isLoading, isError, error } = useInvestissementList();
@@ -127,6 +128,9 @@ export default function InvestissementList() {
                                                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                                         <ModifierInvestModal investissement={investissement} />
                                                     </DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                        <SupprimerInvestModal investissement={investissement} />
+                                                    </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </TableCell>
@@ -162,6 +166,8 @@ export default function InvestissementList() {
                                         <Button variant="default" size="sm">
                                             <Eye className="h-4 w-4 mr-1" />
                                         </Button>
+                                        <ModifierInvestModal investissement={investissement} />
+                                        <SupprimerInvestModal investissement={investissement} />
                                     </div>
                                 </div>
                             </div>

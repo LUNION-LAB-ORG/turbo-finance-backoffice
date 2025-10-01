@@ -21,6 +21,7 @@ import { format, parseISO } from "date-fns"
 import { fr } from "date-fns/locale"
 import { CategorieDetailModal } from "./detail/categorie-detail"
 import { ModifierCategorieModal } from "../modifier/modifier-categorie-modal"
+import SupprimerCategorieModal from "../supprimer/supprimer-categorie-modal"
 
 interface CategorieDepenseProps {
     categorie_depenses: ICategorieDepense[]
@@ -114,7 +115,7 @@ export function CategorieDepenseList({ categorie_depenses }: CategorieDepensePro
                                         <TableCell className="text-center">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button className="bg-red-400 hover:bg-red-600 cursor-pointer ">
+                                                    <Button className="bg-red-400 hover:bg-red-600 cursor-pointer">
                                                         <MoreHorizontal className="h-4 w-4 cursor-pointer" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -124,6 +125,11 @@ export function CategorieDepenseList({ categorie_depenses }: CategorieDepensePro
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                                                         <ModifierCategorieModal categorieDepense={categorie_depense} />
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                                        <SupprimerCategorieModal
+                                                            categorieDepense={categorie_depense}
+                                                        />
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -156,6 +162,8 @@ export function CategorieDepenseList({ categorie_depenses }: CategorieDepensePro
                                         <Button variant="default" size="sm">
                                             <Eye className="h-4 w-4 mr-1" />
                                         </Button>
+                                        <ModifierCategorieModal categorieDepense={categorie_depense} />
+                                        <SupprimerCategorieModal categorieDepense={categorie_depense} />
                                     </div>
                                 </div>
                             </div>
